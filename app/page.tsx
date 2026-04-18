@@ -426,9 +426,9 @@ export default function Home() {
     badgesList.forEach((badge) => {
       if (unlockedBadges.includes(badge.id)) return;
       let conditionMet = false;
-      if (badge.id === "first_log") conditionMet = badge.condition(totalLogs);
-      else if (badge.id.includes("prod_")) conditionMet = badge.condition(actualScores.productivity);
-      else if (badge.id.includes("happy_")) conditionMet = badge.condition(actualScores.happiness);
+      if (badge.id === "first_log") conditionMet = badge.condition(totalLogs, 0);
+      else if (badge.id.includes("prod_")) conditionMet = badge.condition(actualScores.productivity, 0);
+      else if (badge.id.includes("happy_")) conditionMet = badge.condition(actualScores.happiness, 0);
       else if (badge.id === "balance_80") conditionMet = badge.condition(actualScores.productivity, actualScores.happiness);
       else if (badge.id.includes("streak_")) conditionMet = badge.condition(streaks.currentStreak);
       else if (badge.id === "all_rounder") conditionMet = badge.condition(uniqueCategories);
