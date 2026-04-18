@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 const categories = [
   "Study",
@@ -92,8 +92,19 @@ const getBreakdown = (
   timelineData: { [hour: number]: Category },
   activityLogs: Array<{ category: Category; hours: number }>
 ) => {
-  const hoursMap: Record<Category, number> = {} as any;
-  categories.forEach((cat) => (hoursMap[cat] = 0));
+  // FIX: Properly typed initial object instead of `{} as any`
+  const hoursMap: Record<Category, number> = {
+    Study: 0,
+    Work: 0,
+    Gym: 0,
+    Sports: 0,
+    Social: 0,
+    Rest: 0,
+    Sleep: 0,
+    "Personal Hobby": 0,
+    Gaming: 0,
+    Other: 0,
+  };
   Object.values(timelineData).forEach((cat) => hoursMap[cat]++);
   activityLogs.forEach(({ category, hours }) => (hoursMap[category] += hours));
   const breakdown: Array<{ category: Category; hours: number; prod: number; happy: number }> = [];
@@ -188,8 +199,20 @@ const playSound = (type: "log" | "badge" | "complete") => {
   }
 };
 
+// FIX: Define a union type for badge condition functions
+type BadgeCondition =
+  | ((a: number) => boolean)
+  | ((a: number, b: number) => boolean)
+  | ((a: Record<Category, number>) => boolean);
+
 // Badges (30)
-const badgesList = [
+const badgesList: Array<{
+  id: string;
+  name: string;
+  description: string;
+  emoji: string;
+  condition: BadgeCondition;
+}> = [
   { id: "first_log", name: "First Steps", description: "Logged your first activity", emoji: "🎯", condition: (totalLogs: number) => totalLogs >= 1 },
   { id: "prod_50", name: "Getting Things Done", description: "Reached 50 Productivity", emoji: "📋", condition: (prod: number) => prod >= 50 },
   { id: "prod_70", name: "Productivity Pro", description: "Reached 70+ Productivity", emoji: "📈", condition: (prod: number) => prod >= 70 },
@@ -295,7 +318,8 @@ export default function Home() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [listening, setListening] = useState(false);
   
-  const recognitionRef = useRef<any>(null);
+  // FIX: Properly type the ref
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   // Load all data
   useEffect(() => {
@@ -421,39 +445,88 @@ export default function Home() {
 
   const challenges = generateChallenges(history, hoursMap, streaks);
 
-  const checkBadges = () => {
-    const newlyUnlocked: string[] = [];
-    badgesList.forEach((badge) => {
-      if (unlockedBadges.includes(badge.id)) return;
-      let conditionMet = false;
-      if (badge.id === "first_log") conditionMet = badge.condition(totalLogs, 0);
-      else if (badge.id.includes("prod_")) conditionMet = badge.condition(actualScores.productivity, 0);
-      else if (badge.id.includes("happy_")) conditionMet = badge.condition(actualScores.happiness, 0);
-      else if (badge.id === "balance_80") conditionMet = badge.condition(actualScores.productivity, actualScores.happiness);
-      else if (badge.id.includes("streak_")) conditionMet = badge.condition(streaks.currentStreak,  0);
-      else if (badge.id === "all_rounder") conditionMet = badge.condition(uniqueCategories, 0);
-      else if (badge.id === "planner") conditionMet = badge.condition(plannedLogs.length, 0);
-      else if (badge.id === "overachiever") conditionMet = badge.condition(prodDiff, 0);
-      else if (badge.id === "recovery_guru") conditionMet = badge.condition(recoveryScore, 0);
-      else if (badge.id === "focus_master") conditionMet = badge.condition(focusScore, 0);
-      else if (badge.id === "balance_guru") conditionMet = badge.condition(balanceScore, 0);
-      else conditionMet = badge.condition(hoursMap, 0);
-      if (conditionMet) newlyUnlocked.push(badge.id);
-    });
-    if (newlyUnlocked.length > 0) {
-      setUnlockedBadges((prev) => [...prev, ...newlyUnlocked]);
-      setNewBadge(newlyUnlocked[0]);
-      setShowCelebration(true);
-      if (soundEnabled) playSound("badge");
-      triggerConfetti();
-      setTimeout(() => setShowCelebration(false), 5000);
-      setTimeout(() => setNewBadge(null), 4000);
-    }
-  };
+  // FIX: Wrap in useCallback with proper dependencies
+  const checkBadges = useCallback(() => {
+  const newlyUnlocked: string[] = [];
 
+  badgesList.forEach((badge) => {
+    if (unlockedBadges.includes(badge.id)) return;
+
+    let conditionMet = false;
+
+    if (badge.id === "first_log") {
+      conditionMet = (badge.condition as (n: number) => boolean)(totalLogs);
+    } else if (badge.id.includes("prod_")) {
+      conditionMet = (badge.condition as (n: number) => boolean)(actualScores.productivity);
+    } else if (badge.id.includes("happy_")) {
+      conditionMet = (badge.condition as (n: number) => boolean)(actualScores.happiness);
+    } else if (badge.id === "balance_80") {
+      conditionMet = (badge.condition as (p: number, h: number) => boolean)(
+        actualScores.productivity,
+        actualScores.happiness
+      );
+    } else if (badge.id.includes("streak_")) {
+      conditionMet = (badge.condition as (n: number) => boolean)(streaks.currentStreak);
+    } else if (badge.id === "all_rounder") {
+      conditionMet = (badge.condition as (n: number) => boolean)(uniqueCategories);
+    } else if (badge.id === "planner") {
+      conditionMet = (badge.condition as (n: number) => boolean)(plannedLogs.length);
+    } else if (badge.id === "overachiever") {
+      conditionMet = (badge.condition as (n: number) => boolean)(prodDiff);
+    } else if (badge.id === "recovery_guru") {
+      conditionMet = (badge.condition as (n: number) => boolean)(recoveryScore);
+    } else if (badge.id === "focus_master") {
+      conditionMet = (badge.condition as (n: number) => boolean)(focusScore);
+    } else if (badge.id === "balance_guru") {
+      conditionMet = (badge.condition as (n: number) => boolean)(balanceScore);
+    } else {
+      conditionMet = (badge.condition as (h: Record<Category, number>) => boolean)(hoursMap);
+    }
+
+    if (conditionMet) newlyUnlocked.push(badge.id);
+  });
+
+  if (newlyUnlocked.length > 0) {
+    setUnlockedBadges((prev) => [...prev, ...newlyUnlocked]);
+    setNewBadge(newlyUnlocked[0]);
+    setShowCelebration(true);
+    if (soundEnabled) playSound("badge");
+    triggerConfetti();
+    setTimeout(() => setShowCelebration(false), 5000);
+    setTimeout(() => setNewBadge(null), 4000);
+  }
+}, [
+  actualScores,
+  streaks,
+  totalLogs,
+  plannedLogs.length,
+  prodDiff,
+  recoveryScore,
+  focusScore,
+  balanceScore,
+  uniqueCategories,
+  hoursMap,
+  soundEnabled,
+  unlockedBadges,
+]);
+
+  // FIX: Add all dependencies to useEffect
   useEffect(() => {
     if (isLoaded) checkBadges();
-  }, [actualScores, streaks, totalLogs, isLoaded, plannedLogs.length, prodDiff, recoveryScore, focusScore, balanceScore]);
+  }, [
+    actualScores,
+    streaks,
+    totalLogs,
+    isLoaded,
+    plannedLogs.length,
+    prodDiff,
+    recoveryScore,
+    focusScore,
+    balanceScore,
+    uniqueCategories,
+    hoursMap,
+    checkBadges,
+  ]);
 
   const getProductivityColor = (score: number) => {
     if (score < 40) return "from-red-400 to-red-600";
