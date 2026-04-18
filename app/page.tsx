@@ -295,9 +295,9 @@ export default function Home() {
   const [plannedLogs, setPlannedLogs] = useState<Array<{ category: Category; hours: number }>>([]);
   const [activeTab, setActiveTab] = useState<"hourly" | "activity">("hourly");
   const [selectedCategory, setSelectedCategory] = useState<Category>("Study");
-  const [hoursInput, setHoursInput] = useState<number>(1);
+  const [hoursInput, setHoursInput] = useState<string>("1");
   const [plannedCategory, setPlannedCategory] = useState<Category>("Study");
-  const [plannedHours, setPlannedHours] = useState<number>(1);
+  const [plannedHours, setPlannedHours] = useState<string>("1");
   const [showScoreModal, setShowScoreModal] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentTab, setCurrentTab] = useState<TabId>("home");
@@ -537,8 +537,10 @@ export default function Home() {
   };
 
   const addActivityLog = () => {
-    if (hoursInput > 0 && hoursInput <= 12) {
-      setActivityLogs([...activityLogs, { category: selectedCategory, hours: hoursInput }]);
+    const hours = parseInt(hoursInput);
+    if (!isNaN(hours) && hours > 0 && hours <= 12) {
+      setActivityLogs([...activityLogs, { category: selectedCategory, hours }]);
+      setHoursInput("1"); // reset to default
       if (soundEnabled) playSound("log");
     }
   };
@@ -548,8 +550,10 @@ export default function Home() {
   };
 
   const addPlannedLog = () => {
-    if (plannedHours > 0 && plannedHours <= 12) {
-      setPlannedLogs([...plannedLogs, { category: plannedCategory, hours: plannedHours }]);
+    const hours = parseInt(plannedHours);
+    if (!isNaN(hours) && hours > 0 && hours <= 12) {
+      setPlannedLogs([...plannedLogs, { category: plannedCategory, hours }]);
+      setPlannedHours("1");
     }
   };
 
@@ -581,6 +585,11 @@ export default function Home() {
   };
 
   const handleDoneClick = () => {
+    // Validate that there is at least some activity logged
+    if (Object.keys(timelineData).length === 0 && activityLogs.length === 0) {
+      alert("Please log at least one activity or hourly block before finishing.");
+      return;
+    }
     saveTodayScore();
     checkBadges();
     setShowScoreModal(true);
@@ -650,6 +659,22 @@ export default function Home() {
     reader.readAsText(file);
   };
 
+  // Helper to handle hours input change (text)
+  const handleHoursInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    // Allow empty string, numbers only
+    if (val === "" || /^\d*$/.test(val)) {
+      setHoursInput(val);
+    }
+  };
+
+  const handlePlannedHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (val === "" || /^\d*$/.test(val)) {
+      setPlannedHours(val);
+    }
+  };
+
   const currentBadge = badgesList.find((b) => b.id === newBadge);
   const pulseCompleted = pulseEnergy && pulseMood && pulseIntention;
   const last7DaysData = [...history].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 7).reverse();
@@ -712,6 +737,7 @@ export default function Home() {
                     : "text-white/50 hover:text-white/80 hover:bg-white/10"
                 }`}
                 title={tab.label}
+                style={{ touchAction: "manipulation" }}
               >
                 <span className="text-lg">{tab.emoji}</span>
                 <span className="text-[10px] font-medium leading-tight">{tab.label}</span>
@@ -763,6 +789,7 @@ export default function Home() {
                               ? "bg-gradient-to-r from-blue-500/40 to-cyan-500/40 border-white/40"
                               : "bg-white/5 border-white/15"
                           }`}
+                          style={{ touchAction: "manipulation" }}
                         >
                           {level === "low" ? "🥱" : level === "mid" ? "😐" : "⚡"} {level}
                         </button>
@@ -781,6 +808,7 @@ export default function Home() {
                               ? "bg-gradient-to-r from-green-500/40 to-lime-500/40 border-white/40"
                               : "bg-white/5 border-white/15"
                           }`}
+                          style={{ touchAction: "manipulation" }}
                         >
                           {mood}
                         </button>
@@ -799,6 +827,7 @@ export default function Home() {
                               ? "bg-gradient-to-r from-purple-500/40 to-pink-500/40 border-white/40"
                               : "bg-white/5 border-white/15"
                           }`}
+                          style={{ touchAction: "manipulation" }}
                         >
                           {intent === "Work" ? "💼" : intent === "Rest" ? "🛋️" : "⚖️"} {intent}
                         </button>
@@ -809,6 +838,7 @@ export default function Home() {
                     onClick={handlePulseSubmit}
                     disabled={!pulseEnergy || !pulseMood || !pulseIntention}
                     className="w-full bg-gradient-to-r from-blue-500/30 to-cyan-500/30 border border-white/30 rounded-xl py-3 font-medium disabled:opacity-30 hover:scale-[1.01] transition-all"
+                    style={{ touchAction: "manipulation" }}
                   >
                     Save Pulse
                   </button>
@@ -831,7 +861,7 @@ export default function Home() {
               )}
             </div>
 
-            {/* Five Metrics Cards with restored colors */}
+            {/* Five Metrics Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div className="bg-gradient-to-br from-blue-950/60 to-black/40 backdrop-blur-xl border border-blue-400/30 rounded-xl p-3 hover:scale-105 transition-transform duration-200">
                 <p className="text-xs text-blue-200/80">Prod</p>
@@ -954,7 +984,7 @@ export default function Home() {
             <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-white/90">Get Today's Score</h2>
-                <button onClick={handleClearToday} className="text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 hover:scale-105 transition-all">
+                <button onClick={handleClearToday} className="text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 hover:scale-105 transition-all" style={{ touchAction: "manipulation" }}>
                   Clear
                 </button>
               </div>
@@ -973,6 +1003,7 @@ export default function Home() {
                       ? "bg-gradient-to-r from-blue-500/30 to-cyan-500/30 text-white border border-white/20"
                       : "text-white/60"
                   }`}
+                  style={{ touchAction: "manipulation" }}
                 >
                   ⏰ Hourly Log
                 </button>
@@ -983,6 +1014,7 @@ export default function Home() {
                       ? "bg-gradient-to-r from-green-500/30 to-lime-500/30 text-white border border-white/20"
                       : "text-white/60"
                   }`}
+                  style={{ touchAction: "manipulation" }}
                 >
                   📋 Activity Log
                 </button>
@@ -1000,6 +1032,7 @@ export default function Home() {
                         className={`p-3 rounded-xl backdrop-blur-md cursor-pointer border hover:scale-[1.02] hover:border-white/40 transition-all ${
                           category ? blockStyles[category] : defaultBlockStyle
                         }`}
+                        style={{ touchAction: "manipulation" }}
                       >
                         <div className="flex justify-between">
                           <span>{hour.toString().padStart(2, "0")}:00 — {(hour + 1).toString().padStart(2, "0")}:00</span>
@@ -1028,11 +1061,17 @@ export default function Home() {
                       <div>
                         <label className="text-xs text-white/60 block mb-1">Hours (1-12)</label>
                         <input
-                          type="number"
-                          min="1"
-                          max="12"
+                          type="text"
+                          inputMode="numeric"
+                          pattern="\d*"
                           value={hoursInput}
-                          onChange={(e) => setHoursInput(Math.min(12, Math.max(1, parseInt(e.target.value) || 1)))}
+                          onChange={handleHoursInputChange}
+                          onBlur={() => {
+                            let val = parseInt(hoursInput);
+                            if (isNaN(val) || val < 1) setHoursInput("1");
+                            else if (val > 12) setHoursInput("12");
+                            else setHoursInput(val.toString());
+                          }}
                           className="w-full bg-black/30 border border-white/20 rounded-xl p-2.5 text-sm text-white"
                         />
                       </div>
@@ -1040,6 +1079,7 @@ export default function Home() {
                     <button
                       onClick={addActivityLog}
                       className="w-full bg-gradient-to-r from-blue-500/30 to-cyan-500/30 border border-white/30 rounded-xl py-3 font-medium hover:scale-[1.01] transition-all"
+                      style={{ touchAction: "manipulation" }}
                     >
                       + Add Entry
                     </button>
@@ -1065,7 +1105,7 @@ export default function Home() {
                             <span className="font-medium">{log.category}</span>
                             <span className="text-sm text-white/50">{log.hours}h</span>
                           </div>
-                          <button onClick={() => removeActivityLog(index)} className="text-white/40 hover:text-red-400 hover:scale-110 transition-all p-1">✕</button>
+                          <button onClick={() => removeActivityLog(index)} className="text-white/40 hover:text-red-400 hover:scale-110 transition-all p-1" style={{ touchAction: "manipulation" }}>✕</button>
                         </div>
                       ))}
                     </div>
@@ -1080,6 +1120,7 @@ export default function Home() {
                     key={cat}
                     onClick={() => setActivityLogs([...activityLogs, { category: cat as Category, hours: 1 }])}
                     className="bg-white/10 border border-white/20 rounded-full px-4 py-2 text-sm hover:scale-105 hover:bg-white/20 transition-all"
+                    style={{ touchAction: "manipulation" }}
                   >
                     +1h {cat}
                   </button>
@@ -1089,6 +1130,7 @@ export default function Home() {
               <button
                 onClick={handleDoneClick}
                 className="w-full mt-6 bg-gradient-to-r from-green-500/30 to-lime-500/30 border border-white/30 rounded-xl py-3 font-semibold hover:scale-[1.01] transition-all"
+                style={{ touchAction: "manipulation" }}
               >
                 ✅ Done
               </button>
@@ -1101,7 +1143,7 @@ export default function Home() {
             <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-white/90">🎯 Daily Goals</h2>
-                <button onClick={handleClearPlanned} className="text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 hover:scale-105 transition-all">
+                <button onClick={handleClearPlanned} className="text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 hover:scale-105 transition-all" style={{ touchAction: "manipulation" }}>
                   Clear
                 </button>
               </div>
@@ -1123,11 +1165,17 @@ export default function Home() {
                   <div>
                     <label className="text-xs text-white/60 block mb-1">Hours (1-12)</label>
                     <input
-                      type="number"
-                      min="1"
-                      max="12"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="\d*"
                       value={plannedHours}
-                      onChange={(e) => setPlannedHours(Math.min(12, Math.max(1, parseInt(e.target.value) || 1)))}
+                      onChange={handlePlannedHoursChange}
+                      onBlur={() => {
+                        let val = parseInt(plannedHours);
+                        if (isNaN(val) || val < 1) setPlannedHours("1");
+                        else if (val > 12) setPlannedHours("12");
+                        else setPlannedHours(val.toString());
+                      }}
                       className="w-full bg-black/30 border border-white/20 rounded-xl p-2.5 text-sm text-white"
                     />
                   </div>
@@ -1135,6 +1183,7 @@ export default function Home() {
                 <button
                   onClick={addPlannedLog}
                   className="w-full bg-gradient-to-r from-purple-500/30 to-pink-500/30 border border-white/30 rounded-xl py-3 font-medium hover:scale-[1.01] transition-all"
+                  style={{ touchAction: "manipulation" }}
                 >
                   + Add Goal
                 </button>
@@ -1149,7 +1198,7 @@ export default function Home() {
                         <span className="font-medium">{log.category}</span>
                         <span className="text-sm text-white/50">{log.hours}h</span>
                       </div>
-                      <button onClick={() => removePlannedLog(index)} className="text-white/40 hover:text-red-400 hover:scale-110 transition-all p-1">✕</button>
+                      <button onClick={() => removePlannedLog(index)} className="text-white/40 hover:text-red-400 hover:scale-110 transition-all p-1" style={{ touchAction: "manipulation" }}>✕</button>
                     </div>
                   ))}
                 </div>
@@ -1355,6 +1404,7 @@ export default function Home() {
                   <button
                     onClick={() => setSoundEnabled(!soundEnabled)}
                     className={`px-3 py-1 rounded-full transition-all hover:scale-105 ${soundEnabled ? "bg-green-500/30" : "bg-white/10"}`}
+                    style={{ touchAction: "manipulation" }}
                   >
                     {soundEnabled ? "On" : "Off"}
                   </button>
@@ -1362,6 +1412,7 @@ export default function Home() {
                 <button
                   onClick={exportData}
                   className="w-full bg-blue-500/20 border border-blue-400/30 rounded-xl py-3 text-blue-300 hover:scale-[1.01] transition-all"
+                  style={{ touchAction: "manipulation" }}
                 >
                   📤 Export Data
                 </button>
@@ -1377,6 +1428,7 @@ export default function Home() {
                     }
                   }}
                   className="w-full bg-red-500/20 border border-red-400/30 rounded-xl py-4 text-red-300 hover:scale-[1.01] transition-all"
+                  style={{ touchAction: "manipulation" }}
                 >
                   Reset All Data
                 </button>
@@ -1385,7 +1437,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* Reflection Modal - appears after score modal */}
+        {/* Reflection Modal */}
         {showReflectionModal && (
           <>
             <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-40" onClick={() => setShowReflectionModal(false)} />
@@ -1403,12 +1455,14 @@ export default function Home() {
                   <button
                     onClick={handleReflectionSubmit}
                     className="flex-1 bg-gradient-to-r from-green-500/30 to-lime-500/30 py-3 rounded-xl hover:scale-105 transition-all"
+                    style={{ touchAction: "manipulation" }}
                   >
                     Save
                   </button>
                   <button
                     onClick={() => setShowReflectionModal(false)}
                     className="flex-1 bg-white/10 py-3 rounded-xl hover:scale-105 transition-all"
+                    style={{ touchAction: "manipulation" }}
                   >
                     Skip
                   </button>
@@ -1424,7 +1478,7 @@ export default function Home() {
             <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-40 animate-fade-in" onClick={handleScoreModalClose} />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-scale-up">
               <div className="w-full max-w-lg">
-                <button onClick={handleScoreModalClose} className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/80 hover:bg-white/20 hover:scale-110 transition-all z-50">✕</button>
+                <button onClick={handleScoreModalClose} className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/80 hover:bg-white/20 hover:scale-110 transition-all z-50" style={{ touchAction: "manipulation" }}>✕</button>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-950/80 to-black/60 backdrop-blur-xl border border-blue-400/40 p-8 hover:scale-[1.02] transition-transform">
                     <div className="absolute -top-16 -right-16 w-32 h-32 bg-blue-500/40 rounded-full blur-3xl" />
@@ -1465,7 +1519,7 @@ export default function Home() {
             <div className="fixed bottom-0 left-0 right-0 z-50 bg-gray-950/95 backdrop-blur-2xl border-t border-white/20 rounded-t-[2rem] p-6 animate-slide-up">
               <div className="flex items-center justify-between mb-6">
                 <p className="text-xl font-semibold">Select category for {selectedHour}:00</p>
-                <button onClick={() => setSelectedHour(null)} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-all">✕</button>
+                <button onClick={() => setSelectedHour(null)} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-all" style={{ touchAction: "manipulation" }}>✕</button>
               </div>
               <div className="grid grid-cols-4 gap-3">
                 {categories.map((cat) => (
@@ -1473,6 +1527,7 @@ export default function Home() {
                     key={cat}
                     onClick={() => handleHourSelect(cat)}
                     className="bg-white/5 border border-white/20 p-4 rounded-2xl text-sm font-medium hover:bg-white/15 hover:scale-105 transition-all"
+                    style={{ touchAction: "manipulation" }}
                   >
                     {cat}
                   </button>
