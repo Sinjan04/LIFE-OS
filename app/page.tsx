@@ -430,14 +430,14 @@ export default function Home() {
       else if (badge.id.includes("prod_")) conditionMet = badge.condition(actualScores.productivity, 0);
       else if (badge.id.includes("happy_")) conditionMet = badge.condition(actualScores.happiness, 0);
       else if (badge.id === "balance_80") conditionMet = badge.condition(actualScores.productivity, actualScores.happiness);
-      else if (badge.id.includes("streak_")) conditionMet = badge.condition(streaks.currentStreak);
-      else if (badge.id === "all_rounder") conditionMet = badge.condition(uniqueCategories);
-      else if (badge.id === "planner") conditionMet = badge.condition(plannedLogs.length);
-      else if (badge.id === "overachiever") conditionMet = badge.condition(prodDiff);
-      else if (badge.id === "recovery_guru") conditionMet = badge.condition(recoveryScore);
-      else if (badge.id === "focus_master") conditionMet = badge.condition(focusScore);
-      else if (badge.id === "balance_guru") conditionMet = badge.condition(balanceScore);
-      else conditionMet = badge.condition(hoursMap);
+      else if (badge.id.includes("streak_")) conditionMet = badge.condition(streaks.currentStreak,  0);
+      else if (badge.id === "all_rounder") conditionMet = badge.condition(uniqueCategories, 0);
+      else if (badge.id === "planner") conditionMet = badge.condition(plannedLogs.length, 0);
+      else if (badge.id === "overachiever") conditionMet = badge.condition(prodDiff, 0);
+      else if (badge.id === "recovery_guru") conditionMet = badge.condition(recoveryScore, 0);
+      else if (badge.id === "focus_master") conditionMet = badge.condition(focusScore, 0);
+      else if (badge.id === "balance_guru") conditionMet = badge.condition(balanceScore, 0);
+      else conditionMet = badge.condition(hoursMap, 0);
       if (conditionMet) newlyUnlocked.push(badge.id);
     });
     if (newlyUnlocked.length > 0) {
