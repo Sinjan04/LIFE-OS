@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const categories = [
   "Study",
@@ -92,7 +92,6 @@ const getBreakdown = (
   timelineData: { [hour: number]: Category },
   activityLogs: Array<{ category: Category; hours: number }>
 ) => {
-  // FIX: Properly typed initial object instead of `{} as any`
   const hoursMap: Record<Category, number> = {
     Study: 0,
     Work: 0,
@@ -199,13 +198,11 @@ const playSound = (type: "log" | "badge" | "complete") => {
   }
 };
 
-// FIX: Define a union type for badge condition functions
 type BadgeCondition =
   | ((a: number) => boolean)
   | ((a: number, b: number) => boolean)
   | ((a: Record<Category, number>) => boolean);
 
-// Badges (30)
 const badgesList: Array<{
   id: string;
   name: string;
@@ -245,7 +242,6 @@ const badgesList: Array<{
   { id: "balance_guru", name: "Balance Guru", description: "Balance score 90+", emoji: "☯️", condition: (balance: number) => balance >= 90 },
 ];
 
-// Weekly Challenges Generator
 const generateChallenges = (
   history: Array<{ date: string; productivity: number; happiness: number }>,
   hoursMap: Record<Category, number>,
@@ -316,10 +312,6 @@ export default function Home() {
   const [showReflectionModal, setShowReflectionModal] = useState(false);
   const [partnerName, setPartnerName] = useState("");
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [listening, setListening] = useState(false);
-  
-  // FIX: Properly type the ref
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   // Load all data
   useEffect(() => {
@@ -445,72 +437,49 @@ export default function Home() {
 
   const challenges = generateChallenges(history, hoursMap, streaks);
 
-  // FIX: Wrap in useCallback with proper dependencies
   const checkBadges = useCallback(() => {
-  const newlyUnlocked: string[] = [];
-
-  badgesList.forEach((badge) => {
-    if (unlockedBadges.includes(badge.id)) return;
-
-    let conditionMet = false;
-
-    if (badge.id === "first_log") {
-      conditionMet = (badge.condition as (n: number) => boolean)(totalLogs);
-    } else if (badge.id.includes("prod_")) {
-      conditionMet = (badge.condition as (n: number) => boolean)(actualScores.productivity);
-    } else if (badge.id.includes("happy_")) {
-      conditionMet = (badge.condition as (n: number) => boolean)(actualScores.happiness);
-    } else if (badge.id === "balance_80") {
-      conditionMet = (badge.condition as (p: number, h: number) => boolean)(
-        actualScores.productivity,
-        actualScores.happiness
-      );
-    } else if (badge.id.includes("streak_")) {
-      conditionMet = (badge.condition as (n: number) => boolean)(streaks.currentStreak);
-    } else if (badge.id === "all_rounder") {
-      conditionMet = (badge.condition as (n: number) => boolean)(uniqueCategories);
-    } else if (badge.id === "planner") {
-      conditionMet = (badge.condition as (n: number) => boolean)(plannedLogs.length);
-    } else if (badge.id === "overachiever") {
-      conditionMet = (badge.condition as (n: number) => boolean)(prodDiff);
-    } else if (badge.id === "recovery_guru") {
-      conditionMet = (badge.condition as (n: number) => boolean)(recoveryScore);
-    } else if (badge.id === "focus_master") {
-      conditionMet = (badge.condition as (n: number) => boolean)(focusScore);
-    } else if (badge.id === "balance_guru") {
-      conditionMet = (badge.condition as (n: number) => boolean)(balanceScore);
-    } else {
-      conditionMet = (badge.condition as (h: Record<Category, number>) => boolean)(hoursMap);
+    const newlyUnlocked: string[] = [];
+    badgesList.forEach((badge) => {
+      if (unlockedBadges.includes(badge.id)) return;
+      let conditionMet = false;
+      if (badge.id === "first_log") conditionMet = (badge.condition as (n: number) => boolean)(totalLogs);
+      else if (badge.id.includes("prod_")) conditionMet = (badge.condition as (n: number) => boolean)(actualScores.productivity);
+      else if (badge.id.includes("happy_")) conditionMet = (badge.condition as (n: number) => boolean)(actualScores.happiness);
+      else if (badge.id === "balance_80") conditionMet = (badge.condition as (p: number, h: number) => boolean)(actualScores.productivity, actualScores.happiness);
+      else if (badge.id.includes("streak_")) conditionMet = (badge.condition as (n: number) => boolean)(streaks.currentStreak);
+      else if (badge.id === "all_rounder") conditionMet = (badge.condition as (n: number) => boolean)(uniqueCategories);
+      else if (badge.id === "planner") conditionMet = (badge.condition as (n: number) => boolean)(plannedLogs.length);
+      else if (badge.id === "overachiever") conditionMet = (badge.condition as (n: number) => boolean)(prodDiff);
+      else if (badge.id === "recovery_guru") conditionMet = (badge.condition as (n: number) => boolean)(recoveryScore);
+      else if (badge.id === "focus_master") conditionMet = (badge.condition as (n: number) => boolean)(focusScore);
+      else if (badge.id === "balance_guru") conditionMet = (badge.condition as (n: number) => boolean)(balanceScore);
+      else conditionMet = (badge.condition as (h: Record<Category, number>) => boolean)(hoursMap);
+      if (conditionMet) newlyUnlocked.push(badge.id);
+    });
+    if (newlyUnlocked.length > 0) {
+      setUnlockedBadges((prev) => [...prev, ...newlyUnlocked]);
+      setNewBadge(newlyUnlocked[0]);
+      setShowCelebration(true);
+      if (soundEnabled) playSound("badge");
+      triggerConfetti();
+      setTimeout(() => setShowCelebration(false), 5000);
+      setTimeout(() => setNewBadge(null), 4000);
     }
+  }, [
+    actualScores,
+    streaks,
+    totalLogs,
+    plannedLogs.length,
+    prodDiff,
+    recoveryScore,
+    focusScore,
+    balanceScore,
+    uniqueCategories,
+    hoursMap,
+    soundEnabled,
+    unlockedBadges,
+  ]);
 
-    if (conditionMet) newlyUnlocked.push(badge.id);
-  });
-
-  if (newlyUnlocked.length > 0) {
-    setUnlockedBadges((prev) => [...prev, ...newlyUnlocked]);
-    setNewBadge(newlyUnlocked[0]);
-    setShowCelebration(true);
-    if (soundEnabled) playSound("badge");
-    triggerConfetti();
-    setTimeout(() => setShowCelebration(false), 5000);
-    setTimeout(() => setNewBadge(null), 4000);
-  }
-}, [
-  actualScores,
-  streaks,
-  totalLogs,
-  plannedLogs.length,
-  prodDiff,
-  recoveryScore,
-  focusScore,
-  balanceScore,
-  uniqueCategories,
-  hoursMap,
-  soundEnabled,
-  unlockedBadges,
-]);
-
-  // FIX: Add all dependencies to useEffect
   useEffect(() => {
     if (isLoaded) checkBadges();
   }, [
@@ -620,7 +589,6 @@ export default function Home() {
 
   const handleScoreModalClose = () => {
     setShowScoreModal(false);
-    // Show reflection modal after score modal closes
     setTimeout(() => setShowReflectionModal(true), 300);
   };
 
@@ -637,45 +605,6 @@ export default function Home() {
 
   const handlePulseSubmit = () => {
     savePulse();
-  };
-
-  const startVoiceRecognition = () => {
-    if (typeof window !== "undefined") {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        alert("Speech recognition not supported in your browser.");
-        return;
-      }
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = "en-US";
-      recognition.onstart = () => setListening(true);
-      recognition.onend = () => setListening(false);
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript.toLowerCase();
-        const match = transcript.match(/(\w+)\s+(\d+)\s*(?:hours?|h)/i);
-        if (match) {
-          const cat = match[1].toLowerCase();
-          const hrs = parseInt(match[2]);
-          const category = categories.find(c => c.toLowerCase() === cat);
-          if (category && hrs > 0 && hrs <= 12) {
-            setActivityLogs(prev => [...prev, { category, hours: hrs }]);
-            if (soundEnabled) playSound("log");
-          }
-        }
-      };
-      recognition.onerror = () => setListening(false);
-      recognition.start();
-      recognitionRef.current = recognition;
-    }
-  };
-
-  const stopVoiceRecognition = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-      setListening(false);
-    }
   };
 
   const exportData = () => {
@@ -1082,24 +1011,6 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    {!listening ? (
-                      <button
-                        onClick={startVoiceRecognition}
-                        className="px-3 py-2 rounded-full transition-all hover:scale-105 bg-white/10 border border-white/20 text-sm"
-                      >
-                        🎤 Voice Log
-                      </button>
-                    ) : (
-                      <button
-                        onClick={stopVoiceRecognition}
-                        className="px-3 py-2 rounded-full transition-all hover:scale-105 bg-red-500/30 border border-red-400/40 text-sm"
-                      >
-                        ⏹️ Stop Listening
-                      </button>
-                    )}
-                    <span className="text-xs text-white/50">Say "Study 3 hours"</span>
-                  </div>
                   <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
                     <div className="grid grid-cols-2 gap-3 mb-4">
                       <div>
