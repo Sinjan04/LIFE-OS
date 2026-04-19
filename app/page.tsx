@@ -12,14 +12,15 @@ const categories = [
   "Sleep",
   "Personal Hobby",
   "Gaming",
+  "Meals",
   "Other",
 ] as const;
 
 type Category = (typeof categories)[number];
 
 const productivityMap: Record<Category, number> = {
-  Study: 10,
-  Work: 10,
+  Study: 12,       // increased from 10
+  Work: 12,        // increased from 10
   Gym: 8,
   Sports: 7,
   Social: 0,
@@ -27,6 +28,7 @@ const productivityMap: Record<Category, number> = {
   Sleep: 0,
   "Personal Hobby": 0,
   Gaming: 0,
+  Meals: 2,        // small productivity boost from proper meals
   Other: 0,
 };
 
@@ -38,12 +40,12 @@ const happinessMap: Record<Category, number> = {
   "Personal Hobby": 8,
   Gaming: 7,
   Rest: 5,
+  Meals: 6,        // good food = happy
   Study: 0,
   Work: 0,
   Other: 0,
 };
 
-// NEW: Token earning rates
 const tokenEarnMap: Record<Category, number> = {
   Study: 10,
   Work: 10,
@@ -53,11 +55,13 @@ const tokenEarnMap: Record<Category, number> = {
   Rest: 0,
   Sleep: 0,
   "Personal Hobby": 0,
-  Gaming: -5, // negative = cost
+  Gaming: -5,
+  Meals: 0,        // meals don't cost tokens
   Other: 0,
 };
 
-// NEW: RPG Stat mapping
+// NEW: Additional stat impacts for Meals
+// Meals contribute to VIT (vitality) and recovery
 const statMap: Record<Category, "INT" | "STR" | "CHA" | "VIT" | "SPR" | null> = {
   Study: "INT",
   Work: "INT",
@@ -68,9 +72,9 @@ const statMap: Record<Category, "INT" | "STR" | "CHA" | "VIT" | "SPR" | null> = 
   Sleep: "VIT",
   "Personal Hobby": "SPR",
   Gaming: null,
+  Meals: "VIT",    // nutrition = vitality
   Other: null,
 };
-
 const blockStyles: Record<Category, string> = {
   Study: "bg-gradient-to-r from-blue-900/30 to-blue-800/30 border-blue-400/40",
   Work: "bg-gradient-to-r from-indigo-900/30 to-indigo-800/30 border-indigo-400/40",
@@ -81,6 +85,7 @@ const blockStyles: Record<Category, string> = {
   Sleep: "bg-gradient-to-r from-purple-900/30 to-indigo-800/30 border-purple-400/40",
   "Personal Hobby": "bg-gradient-to-r from-pink-900/30 to-rose-800/30 border-pink-400/40",
   Gaming: "bg-gradient-to-r from-cyan-900/30 to-teal-800/30 border-cyan-400/40",
+  Meals: "bg-gradient-to-r from-amber-900/30 to-orange-800/30 border-amber-400/40",
   Other: "bg-gradient-to-r from-gray-800/30 to-gray-700/30 border-gray-400/40",
 };
 
@@ -172,6 +177,7 @@ const getBreakdown = (
     Sleep: 0,
     "Personal Hobby": 0,
     Gaming: 0,
+    Meals: 0,
     Other: 0,
   };
   Object.values(timelineData).forEach((cat) => hoursMap[cat]++);
@@ -402,6 +408,8 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
   const [tokenBalance, setTokenBalance] = useState(0);
   const [prevLevel, setPrevLevel] = useState(0);
   const [showLevelUp, setShowLevelUp] = useState(false);
+    const [showDetails, setShowDetails] = useState(false);
+    const [showRpgInfo, setShowRpgInfo] = useState(false);
   
   const dailyModifier = getDailyModifier();
   const level = Math.floor(totalXP / 100);
@@ -1009,8 +1017,8 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
 
         {/* Tab Content */}
         {currentTab === "home" && (
-          <div className="max-w-2xl mx-auto space-y-5">
-            {/* NEW: Identity Panel */}
+          <div className="max-w-2xl mx-auto space-y-4">
+            {/* 1. Identity Panel */}
             <div className="bg-gradient-to-r from-blue-950/40 to-purple-950/40 backdrop-blur-xl border border-white/20 rounded-2xl p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -1043,312 +1051,172 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
               </div>
             </div>
 
-            {/* Streaks + Partner */}
-            <div className="flex justify-center gap-6">
-              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/15 rounded-full px-5 py-2 hover:scale-105 transition-transform duration-200">
-                <span className="text-xl">🔥</span>
-                <span className="font-semibold">{streaks.currentStreak}</span>
-                <span className="text-xs text-white/60">Day Streak</span>
+            {/* 2. Today's Scores Grid (Five Metrics) */}
+            <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-3xl p-4">
+              <h2 className="text-sm font-semibold mb-3 text-white/60 uppercase tracking-wider flex items-center gap-2">
+                <span>📊 Today's Scores</span>
+              </h2>
+              <div className="grid grid-cols-5 gap-2">
+                {[
+                  { label: "Prod", value: actualScores.productivity, color: "blue" },
+                  { label: "Happy", value: actualScores.happiness, color: "green" },
+                  { label: "Balance", value: balanceScore, color: "purple" },
+                  { label: "Focus", value: focusScore, color: "amber" },
+                  { label: "Recovery", value: recoveryScore, color: "teal" },
+                ].map((item) => (
+                  <div key={item.label} className="text-center">
+                    <p className="text-[10px] text-white/50">{item.label}</p>
+                    <p className={`text-xl font-bold text-${item.color}-300`}>{item.value}</p>
+                  </div>
+                ))}
               </div>
-              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/15 rounded-full px-5 py-2 hover:scale-105 transition-transform duration-200">
-                <span className="text-xl">💪</span>
-                <span className="font-semibold">{streaks.highPerfStreak}</span>
-                <span className="text-xs text-white/60">High Perf</span>
-              </div>
-              {partnerName && (
-                <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/15 rounded-full px-5 py-2 hover:scale-105 transition-transform duration-200">
-                  <span className="text-xl">🤝</span>
-                  <span className="font-semibold">{partnerName}</span>
+              {/* Mini progress bars */}
+              <div className="mt-3 space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] w-12 text-white/50">Prod</span>
+                  <div className="flex-1 h-1.5 bg-white/10 rounded-full">
+                    <div className="h-full bg-blue-400 rounded-full" style={{ width: `${actualScores.productivity}%` }} />
+                  </div>
                 </div>
-              )}
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] w-12 text-white/50">Happy</span>
+                  <div className="flex-1 h-1.5 bg-white/10 rounded-full">
+                    <div className="h-full bg-green-400 rounded-full" style={{ width: `${actualScores.happiness}%` }} />
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Today's Pulse */}
-            <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5 hover:scale-[1.01] transition-transform duration-200">
-              <h2 className="text-lg font-semibold mb-4 text-white/80 flex items-center gap-2">
-                <span>⚡ Today's Pulse</span>
-                {pulseCompleted && <span className="text-green-400 text-sm">✓</span>}
-              </h2>
-              {!pulseCompleted ? (
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm text-white/60 mb-2">Energy</p>
-                    <div className="grid grid-cols-4 gap-2">
-                      {[
-                        { value: "low", label: "🥱 Low" },
-                        { value: "mid", label: "😐 Mid" },
-                        { value: "high", label: "⚡ High" },
-                        { value: "drained", label: "🪫 Drained" },
-                      ].map(({ value, label }) => (
-                        <button
-                          key={value}
-                          onClick={() => setPulseEnergy(value as any)}
-                          className={`py-2.5 rounded-xl border text-sm transition-all ${
-                            pulseEnergy === value
-                              ? "bg-gradient-to-r from-blue-500/40 to-cyan-500/40 border-white/40"
-                              : "bg-white/5 border-white/15"
-                          }`}
-                          style={{ touchAction: "manipulation" }}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm text-white/60 mb-2">Mood</p>
-                    <div className="grid grid-cols-3 gap-2">
-                      {["😊", "😐", "😤", "😢", "🤩", "😴"].map((mood) => (
-                        <button
-                          key={mood}
-                          onClick={() => setPulseMood(mood as any)}
-                          className={`py-2.5 rounded-xl border text-xl ${
-                            pulseMood === mood
-                              ? "bg-gradient-to-r from-green-500/40 to-lime-500/40 border-white/40"
-                              : "bg-white/5 border-white/15"
-                          }`}
-                          style={{ touchAction: "manipulation" }}
-                        >
-                          {mood}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm text-white/60 mb-2">Intention</p>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { value: "Work", emoji: "💼" },
-                        { value: "Rest", emoji: "🛋️" },
-                        { value: "Balance", emoji: "⚖️" },
-                        { value: "Survive", emoji: "🧟" },
-                        { value: "Create", emoji: "🎨" },
-                      ].map(({ value, emoji }) => (
-                        <button
-                          key={value}
-                          onClick={() => setPulseIntention(value as any)}
-                          className={`py-2.5 rounded-xl border text-sm ${
-                            pulseIntention === value
-                              ? "bg-gradient-to-r from-purple-500/40 to-pink-500/40 border-white/40"
-                              : "bg-white/5 border-white/15"
-                          }`}
-                          style={{ touchAction: "manipulation" }}
-                        >
-                          {emoji} {value}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <button
-                    onClick={handlePulseSubmit}
-                    disabled={!pulseEnergy || !pulseMood || !pulseIntention}
-                    className="w-full bg-gradient-to-r from-blue-500/30 to-cyan-500/30 border border-white/30 rounded-xl py-3 font-medium disabled:opacity-30 hover:scale-[1.01] transition-all"
-                    style={{ touchAction: "manipulation" }}
-                  >
-                    Save Pulse
-                  </button>
-                </div>
-              ) : (
-                <div className="py-2">
-                  <div className="flex justify-around mb-4">
-                    <div className="text-center">
-                      <span className="text-3xl">
-                        {pulseEnergy === "low" ? "🥱" : pulseEnergy === "mid" ? "😐" : pulseEnergy === "high" ? "⚡" : "🪫"}
-                      </span>
-                      <p className="text-xs text-white/60 mt-1 capitalize">{pulseEnergy}</p>
-                    </div>
-                    <div className="text-center">
-                      <span className="text-3xl">{pulseMood}</span>
-                      <p className="text-xs text-white/60 mt-1">Mood</p>
-                    </div>
-                    <div className="text-center">
-                      <span className="text-3xl">
-                        {pulseIntention === "Work" ? "💼" : pulseIntention === "Rest" ? "🛋️" : pulseIntention === "Balance" ? "⚖️" : pulseIntention === "Survive" ? "🧟" : "🎨"}
-                      </span>
-                      <p className="text-xs text-white/60 mt-1">{pulseIntention}</p>
-                    </div>
-                  </div>
-                  {/* Witty Feedback */}
-                  <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-400/30 rounded-xl p-3 text-center">
-                    <p className="text-lg mb-1">{getPulseFeedback(pulseEnergy, pulseMood, pulseIntention).emoji}</p>
-                    <p className="text-sm text-white/80 italic">
-                      "{getPulseFeedback(pulseEnergy, pulseMood, pulseIntention).text}"
-                    </p>
+            {/* 3. Daily Modifier (if exists) */}
+            {dailyModifier.type && (
+              <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-sm border border-purple-400/40 rounded-full px-4 py-2 text-center text-sm">
+                <span className="mr-2">{dailyModifier.emoji}</span>
+                <span className="font-medium">{dailyModifier.name}</span>
+                <span className="mx-2 text-white/50">|</span>
+                <span>Prod {dailyModifier.prodMultiplier}x · Happy {dailyModifier.happyMultiplier}x</span>
+              </div>
+            )}
+
+            {/* 4. Pulse (compact version) */}
+            <div className="bg-gradient-to-br from-amber-950/20 to-orange-950/20 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-white/70">⚡ Pulse</h3>
+                {pulseCompleted && <span className="text-green-400 text-xs">✓</span>}
+              </div>
+              {pulseCompleted ? (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">
+                      {pulseEnergy === "low" ? "🥱" : pulseEnergy === "mid" ? "😐" : pulseEnergy === "high" ? "⚡" : "🪫"}
+                    </span>
+                    <span className="text-xl">{pulseMood}</span>
+                    <span className="text-xl">
+                      {pulseIntention === "Work" ? "💼" : pulseIntention === "Rest" ? "🛋️" : pulseIntention === "Balance" ? "⚖️" : pulseIntention === "Survive" ? "🧟" : "🎨"}
+                    </span>
                   </div>
                   <button
                     onClick={() => {
                       setPulseEnergy(null);
                       setPulseMood(null);
                       setPulseIntention(null);
-                      if (typeof window !== "undefined") {
-                        localStorage.removeItem("lifeos_pulse");
-                      }
+                      if (typeof window !== "undefined") localStorage.removeItem("lifeos_pulse");
                     }}
-                    className="w-full mt-3 text-xs text-white/50 hover:text-white/80 transition-colors"
+                    className="text-xs text-white/40 hover:text-white/80"
                   >
-                    Redo Pulse
+                    Redo
                   </button>
                 </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    // Scroll to pulse section or expand inline
+                    const pulseSection = document.getElementById('pulse-section');
+                    if (pulseSection) pulseSection.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="w-full text-left text-sm text-white/50"
+                >
+                  Tap to set today's energy, mood & intention →
+                </button>
               )}
             </div>
 
-            {/* Five Metrics Cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              <div className="bg-gradient-to-br from-blue-950/60 to-black/40 backdrop-blur-xl border border-blue-400/30 rounded-xl p-3 hover:scale-105 transition-transform duration-200">
-                <p className="text-xs text-blue-200/80">Prod</p>
-                <p className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-200">{actualScores.productivity}</p>
-                <div className="mt-1 w-full h-1 bg-white/10 rounded-full">
-                  <div className={`h-full bg-gradient-to-r ${getProductivityColor(actualScores.productivity)}`} style={{ width: `${actualScores.productivity}%` }} />
-                </div>
-              </div>
-              <div className="bg-gradient-to-br from-lime-950/60 to-black/40 backdrop-blur-xl border border-green-400/30 rounded-xl p-3 hover:scale-105 transition-transform duration-200">
-                <p className="text-xs text-lime-200/80">Happy</p>
-                <p className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-lime-200 to-green-200">{actualScores.happiness}</p>
-                <div className="mt-1 w-full h-1 bg-white/10 rounded-full">
-                  <div className={`h-full bg-gradient-to-r ${getHappinessColor(actualScores.happiness)}`} style={{ width: `${actualScores.happiness}%` }} />
-                </div>
-              </div>
-              <div className="bg-gradient-to-br from-purple-950/60 to-black/40 backdrop-blur-xl border border-purple-400/30 rounded-xl p-3 hover:scale-105 transition-transform duration-200">
-                <p className="text-xs text-purple-200/80">Balance</p>
-                <p className="text-2xl font-black text-purple-200">{balanceScore}</p>
-                <div className="mt-1 w-full h-1 bg-white/10 rounded-full">
-                  <div className="h-full bg-gradient-to-r from-purple-400 to-pink-400" style={{ width: `${balanceScore}%` }} />
-                </div>
-              </div>
-              <div className="bg-gradient-to-br from-amber-950/60 to-black/40 backdrop-blur-xl border border-amber-400/30 rounded-xl p-3 hover:scale-105 transition-transform duration-200">
-                <p className="text-xs text-amber-200/80">Focus</p>
-                <p className="text-2xl font-black text-amber-200">{focusScore}</p>
-                <div className="mt-1 w-full h-1 bg-white/10 rounded-full">
-                  <div className="h-full bg-gradient-to-r from-amber-400 to-yellow-400" style={{ width: `${focusScore}%` }} />
-                </div>
-              </div>
-              <div className="bg-gradient-to-br from-teal-950/60 to-black/40 backdrop-blur-xl border border-teal-400/30 rounded-xl p-3 hover:scale-105 transition-transform duration-200">
-                <p className="text-xs text-teal-200/80">Recovery</p>
-                <p className="text-2xl font-black text-teal-200">{recoveryScore}</p>
-                <div className="mt-1 w-full h-1 bg-white/10 rounded-full">
-                  <div className="h-full bg-gradient-to-r from-teal-400 to-cyan-400" style={{ width: `${recoveryScore}%` }} />
-                </div>
+            {/* 5. Smart Suggestion */}
+            <div className="bg-gradient-to-r from-purple-950/30 to-pink-950/30 backdrop-blur-xl border border-purple-400/30 rounded-2xl p-3">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">{suggestion.emoji}</span>
+                <p className="text-sm text-white/80">{suggestion.text}</p>
               </div>
             </div>
-              {/* Category Hours Bar Chart */}
-{totalHours > 0 && (
-  <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5 hover:scale-[1.01] transition-transform duration-200">
-    <h2 className="text-sm font-semibold mb-3 text-white/60 uppercase tracking-wider">Today's Time Allocation</h2>
-    <div className="space-y-2">
-      {Object.entries(hoursMap)
-        .filter(([_, hours]) => hours > 0)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5) // show top 5 categories
-        .map(([cat, hours]) => {
-          const percentage = (hours / totalHours) * 100;
-          const colorClass = 
-            cat === "Study" ? "bg-blue-400" :
-            cat === "Work" ? "bg-indigo-400" :
-            cat === "Gym" ? "bg-orange-400" :
-            cat === "Sports" ? "bg-red-400" :
-            cat === "Social" ? "bg-green-400" :
-            cat === "Rest" ? "bg-yellow-400" :
-            cat === "Sleep" ? "bg-purple-400" :
-            cat === "Personal Hobby" ? "bg-pink-400" :
-            cat === "Gaming" ? "bg-cyan-400" : "bg-gray-400";
-          return (
-            <div key={cat} className="flex items-center gap-2 text-xs">
-              <span className="w-20 truncate">{cat}</span>
-              <div className="flex-1 h-4 bg-white/10 rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${colorClass}`}
-                  style={{ width: `${percentage}%` }}
-                />
-              </div>
-              <span className="w-10 text-right">{hours}h</span>
-            </div>
-          );
-        })}
-    </div>
-    {Object.keys(hoursMap).filter(k => hoursMap[k as Category] > 0).length > 5 && (
-      <p className="text-xs text-white/40 mt-2 text-center">
-        +{Object.keys(hoursMap).filter(k => hoursMap[k as Category] > 0).length - 5} more categories
-      </p>
-    )}
-  </div>
-)}
 
-            {/* Weekly Challenges */}
-            {challenges.length > 0 && (
-              <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5 hover:scale-[1.01] transition-transform duration-200">
-                <h2 className="text-lg font-semibold mb-3 text-white/80">🎯 Weekly Challenges</h2>
-                <div className="space-y-3">
-                  {challenges.map((ch) => (
-                    <div key={ch.id} className="p-3 bg-white/5 rounded-xl border border-white/10">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="font-medium">{ch.title}</span>
-                        <span className="text-xs text-white/60">{ch.current}/{ch.target}</span>
+            {/* 6. Expandable Details Section */}
+            <button
+              onClick={() => setShowDetails(!showDetails)}
+              className="w-full flex items-center justify-between p-4 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl hover:bg-black/40 transition-colors"
+            >
+              <span className="font-medium text-white/80">📋 View Details</span>
+              <span className={`transition-transform ${showDetails ? 'rotate-90' : ''}`}>▶</span>
+            </button>
+            {showDetails && (
+              <div className="space-y-3 mt-3">
+                {/* Weekly Challenges */}
+                {challenges.length > 0 && (
+                  <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
+                    <h3 className="text-sm font-semibold mb-2 text-white/60">🎯 Challenges</h3>
+                    {challenges.map((ch) => (
+                      <div key={ch.id} className="mb-2">
+                        <div className="flex justify-between text-xs mb-1">
+                          <span>{ch.title}</span>
+                          <span>{ch.current}/{ch.target}</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-white/10 rounded-full">
+                          <div className="h-full bg-purple-400 rounded-full" style={{ width: `${Math.min(100, (ch.current / ch.target) * 100)}%` }} />
+                        </div>
                       </div>
-                      <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-purple-400 to-pink-400 transition-all"
-                          style={{ width: `${Math.min(100, (ch.current / ch.target) * 100)}%` }}
-                        />
+                    ))}
+                  </div>
+                )}
+                
+                {/* Point Allocation */}
+                {breakdown.length > 0 && (
+                  <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
+                    <h3 className="text-sm font-semibold mb-2 text-white/60">📈 Point Sources</h3>
+                    {breakdown.slice(0, 5).map((item) => (
+                      <div key={item.category} className="flex justify-between text-xs py-1">
+                        <span>{item.category} ({item.hours}h)</span>
+                        <div className="flex gap-2">
+                          {item.prod > 0 && <span className="text-blue-300">+{item.prod}P</span>}
+                          {item.happy > 0 && <span className="text-green-300">+{item.happy}H</span>}
+                        </div>
                       </div>
-                      <p className="text-xs text-white/50 mt-1">{ch.reward}</p>
+                    ))}
+                    {breakdown.length > 5 && <p className="text-[10px] text-white/40 mt-1">+{breakdown.length - 5} more</p>}
+                  </div>
+                )}
+
+                {/* Persona */}
+                <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">{persona.emoji}</span>
+                    <div>
+                      <p className="font-medium">{persona.title}</p>
+                      <p className="text-xs text-white/50">{persona.description}</p>
                     </div>
-                  ))}
+                  </div>
+                </div>
+
+                {/* Streaks */}
+                <div className="flex gap-4 justify-center py-2">
+                  <div className="text-center">
+                    <span className="text-xl">🔥</span>
+                    <p className="text-xs">{streaks.currentStreak} day</p>
+                  </div>
+                  <div className="text-center">
+                    <span className="text-xl">💪</span>
+                    <p className="text-xs">{streaks.highPerfStreak} high</p>
+                  </div>
                 </div>
               </div>
             )}
-
-            {/* Persona */}
-            <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5 hover:scale-[1.01] transition-transform duration-200">
-              <h2 className="text-sm font-semibold mb-3 text-white/60 uppercase tracking-wider">Your Persona</h2>
-              <div className="flex items-center gap-4">
-                <span className="text-5xl">{persona.emoji}</span>
-                <div>
-                  <p className="text-2xl font-bold">{persona.title}</p>
-                  <p className="text-sm text-white/60">{persona.description}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Smart Suggestion */}
-            <div className="bg-gradient-to-r from-purple-950/40 to-pink-950/40 backdrop-blur-xl border border-purple-400/30 rounded-3xl p-5 hover:scale-[1.01] transition-transform duration-200">
-              <div className="flex items-start gap-3">
-                <span className="text-2xl">{suggestion.emoji}</span>
-                <div>
-                  <p className="text-sm font-semibold text-purple-200/80 mb-1">Smart Suggestion</p>
-                  <p className="text-white/90">{suggestion.text}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Week at a Glance */}
-            <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5 hover:scale-[1.01] transition-transform duration-200">
-              <h2 className="text-sm font-semibold mb-4 text-white/60 uppercase tracking-wider">Week at a Glance</h2>
-              <div className="overflow-x-auto pb-2 -mx-1 px-1">
-                <div className="flex gap-3 min-w-max justify-center sm:justify-start">
-                  {["Day1", "Day2", "Day3", "Day4", "Day5", "Day6", "Day7"].map((day, idx) => {
-                    const dayData = last7DaysData[idx];
-                    let color = "bg-gray-500/30";
-                    let score = "";
-                    if (dayData) {
-                      if (dayData.productivity >= 70 && dayData.happiness >= 70) color = "bg-green-500/60";
-                      else if (dayData.productivity >= 70) color = "bg-blue-500/60";
-                      else if (dayData.happiness >= 70) color = "bg-lime-500/60";
-                      else color = "bg-yellow-500/60";
-                      score = `${dayData.productivity}/${dayData.happiness}`;
-                    }
-                    return (
-                      <div key={idx} className="text-center w-16 flex-shrink-0">
-                        <div className={`w-12 h-12 mx-auto rounded-full ${color} flex items-center justify-center text-sm border border-white/20`}>
-                          {dayData ? "✓" : "·"}
-                        </div>
-                        <p className="text-xs text-white/50 mt-1">{day}</p>
-                        {score && <p className="text-[10px] text-white/40">{score}</p>}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
           </div>
         )}
 
@@ -1755,10 +1623,19 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
           <div className="max-w-2xl mx-auto space-y-5">
             {/* RPG Character Stats Card */}
             <div className="bg-gradient-to-br from-purple-950/60 to-indigo-950/60 backdrop-blur-xl border border-purple-400/30 rounded-3xl p-5">
-              <h2 className="text-lg font-semibold mb-3 text-white/80 flex items-center gap-2">
-                <span>🎮 Character Stats</span>
-                <span className="text-xs bg-purple-500/20 px-2 py-0.5 rounded-full">RPG</span>
-              </h2>
+                            <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-semibold text-white/80 flex items-center gap-2">
+                  <span>🎮 Character Stats</span>
+                  <span className="text-xs bg-purple-500/20 px-2 py-0.5 rounded-full">RPG</span>
+                </h2>
+                <button
+                  onClick={() => setShowRpgInfo(true)}
+                  className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-sm hover:bg-white/20 transition-colors"
+                  style={{ touchAction: "manipulation" }}
+                >
+                  ?
+                </button>
+              </div>
               <div className="space-y-3">
                 {Object.entries(rpgStats).map(([stat, value]) => (
                   <div key={stat}>
@@ -2263,14 +2140,21 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-950/80 to-black/60 backdrop-blur-xl border border-blue-400/40 p-8 hover:scale-[1.02] transition-transform">
-                    <div className="absolute -top-16 -right-16 w-32 h-32 bg-blue-500/40 rounded-full blur-3xl" />
-                    <p className="text-lg font-semibold text-blue-200/90 uppercase mb-2">Productivity</p>
-                    <p className="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-200">{actualScores.productivity}</p>
-                    <div className="mt-6 w-full h-3 bg-white/10 rounded-full">
-                      <div className={`h-full bg-gradient-to-r ${getProductivityColor(actualScores.productivity)}`} style={{ width: `${actualScores.productivity}%` }} />
-                    </div>
+                                {/* Additional Scores */}
+                <div className="grid grid-cols-3 gap-3 mt-4">
+                  <div className="bg-white/5 rounded-xl p-3 text-center">
+                    <p className="text-xs text-white/50">Balance</p>
+                    <p className="text-xl font-bold text-purple-300">{balanceScore}</p>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-3 text-center">
+                    <p className="text-xs text-white/50">Focus</p>
+                    <p className="text-xl font-bold text-amber-300">{focusScore}</p>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-3 text-center">
+                    <p className="text-xs text-white/50">Recovery</p>
+                    <p className="text-xl font-bold text-teal-300">{recoveryScore}</p>
+                  </div>
+                </div>
                     {projectedScores.productivity > 0 && (
                       <p className="text-sm text-blue-200/60 mt-2">Projected: {projectedScores.productivity}</p>
                     )}
@@ -2317,6 +2201,30 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                     Continue
                   </button>
                 </div>
+              </div>
+            </div>
+          </>
+        )}
+                {/* RPG Info Modal */}
+        {showRpgInfo && (
+          <>
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-50" onClick={() => setShowRpgInfo(false)} />
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-3xl p-6 w-full max-w-md">
+                <h3 className="text-xl font-semibold mb-4">📖 RPG System Guide</h3>
+                <div className="space-y-3 text-sm">
+                  <p><span className="font-medium text-blue-300">🧠 INT (Intelligence):</span> Grows with Study & Work. Represents mental focus.</p>
+                  <p><span className="font-medium text-red-300">💪 STR (Strength):</span> Grows with Gym & Sports. Physical power.</p>
+                  <p><span className="font-medium text-green-300">🫂 CHA (Charisma):</span> Grows with Social time. Connection skill.</p>
+                  <p><span className="font-medium text-purple-300">❤️ VIT (Vitality):</span> Grows with Sleep, Rest, and Meals. Recovery capacity.</p>
+                  <p><span className="font-medium text-pink-300">✨ SPR (Spirit):</span> Grows with Personal Hobby. Creative energy.</p>
+                  <div className="border-t border-white/10 pt-3 mt-3">
+                    <p className="font-medium">📈 How XP Works:</p>
+                    <p>Every logged hour = 10 XP. 100 XP = 1 Level. Higher levels unlock new ranks.</p>
+                    <p>Stats are purely for role‑play and insight—they don't affect scoring.</p>
+                  </div>
+                </div>
+                <button onClick={() => setShowRpgInfo(false)} className="w-full mt-4 bg-white/10 py-3 rounded-xl hover:bg-white/20 transition-colors">Got it</button>
               </div>
             </div>
           </>
