@@ -1889,30 +1889,96 @@ export default function Home() {
                   </>
                 )}
                 {onboardingStep === 1 && (
-                  <>
-                    <h3 className="text-xl font-semibold mb-2">Step 1: Check-in ⚡</h3>
-                    <p className="text-white/70 mb-4">Complete your daily pulse: Energy, Mood, Intention.</p>
-                    <div className="bg-blue-500/10 border border-blue-400/30 rounded-xl p-3 mb-4">
-                      <p className="text-sm">Find this card on the Home tab. Tap each option.</p>
-                    </div>
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => setOnboardingStep(0)}
-                        className="flex-1 bg-white/10 py-3 rounded-xl"
-                      >
-                        Back
-                      </button>
-                      <button
-                        onClick={handlePulseSubmit}
-                        className={`flex-1 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 py-3 rounded-xl ${!pulseCompleted && "opacity-50"}`}
-                        disabled={!pulseCompleted}
-                        style={{ touchAction: "manipulation" }}
-                      >
-                        {pulseCompleted ? "Next" : "Complete Pulse"}
-                      </button>
-                    </div>
-                  </>
-                )}
+  <>
+    <h3 className="text-xl font-semibold mb-2">Step 1: Check-in ⚡</h3>
+    <p className="text-white/70 mb-4">How are you feeling today?</p>
+    
+    {/* Energy */}
+    <div className="mb-4">
+      <p className="text-sm text-white/60 mb-2">Energy</p>
+      <div className="flex gap-2">
+        {["low", "mid", "high"].map((level) => (
+          <button
+            key={level}
+            onClick={() => setPulseEnergy(level as any)}
+            className={`flex-1 py-2.5 rounded-xl border transition-all ${
+              pulseEnergy === level
+                ? "bg-gradient-to-r from-blue-500/40 to-cyan-500/40 border-white/40"
+                : "bg-white/5 border-white/15"
+            }`}
+            style={{ touchAction: "manipulation" }}
+          >
+            {level === "low" ? "🥱" : level === "mid" ? "😐" : "⚡"} {level}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* Mood */}
+    <div className="mb-4">
+      <p className="text-sm text-white/60 mb-2">Mood</p>
+      <div className="flex gap-2">
+        {["😊", "😐", "😤"].map((mood) => (
+          <button
+            key={mood}
+            onClick={() => setPulseMood(mood as any)}
+            className={`flex-1 py-2.5 rounded-xl border text-xl ${
+              pulseMood === mood
+                ? "bg-gradient-to-r from-green-500/40 to-lime-500/40 border-white/40"
+                : "bg-white/5 border-white/15"
+            }`}
+            style={{ touchAction: "manipulation" }}
+          >
+            {mood}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* Intention */}
+    <div className="mb-6">
+      <p className="text-sm text-white/60 mb-2">Intention</p>
+      <div className="flex gap-2">
+        {["Work", "Rest", "Balance"].map((intent) => (
+          <button
+            key={intent}
+            onClick={() => setPulseIntention(intent as any)}
+            className={`flex-1 py-2.5 rounded-xl border text-sm ${
+              pulseIntention === intent
+                ? "bg-gradient-to-r from-purple-500/40 to-pink-500/40 border-white/40"
+                : "bg-white/5 border-white/15"
+            }`}
+            style={{ touchAction: "manipulation" }}
+          >
+            {intent === "Work" ? "💼" : intent === "Rest" ? "🛋️" : "⚖️"} {intent}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div className="flex gap-3">
+      <button
+        onClick={() => setOnboardingStep(0)}
+        className="flex-1 bg-white/10 py-3 rounded-xl"
+      >
+        Back
+      </button>
+      <button
+        onClick={() => {
+          handlePulseSubmit();      // saves pulse to localStorage
+          setOnboardingStep(2);     // advance to next step
+        }}
+        disabled={!pulseEnergy || !pulseMood || !pulseIntention}
+        className={`flex-1 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 py-3 rounded-xl ${
+          !pulseEnergy || !pulseMood || !pulseIntention ? "opacity-50" : ""
+        }`}
+        style={{ touchAction: "manipulation" }}
+      >
+        Save & Continue
+      </button>
+    </div>
+  </>
+)}
                 {onboardingStep === 2 && (
                   <>
                     <h3 className="text-xl font-semibold mb-2">Step 2: Log Activity 📝</h3>
