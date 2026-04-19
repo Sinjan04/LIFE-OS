@@ -1980,31 +1980,44 @@ export default function Home() {
   </>
 )}
                 {onboardingStep === 2 && (
-                  <>
-                    <h3 className="text-xl font-semibold mb-2">Step 2: Log Activity 📝</h3>
-                    <p className="text-white/70 mb-4">Go to the Log tab and add one activity.</p>
-                    <button
-                      onClick={() => setCurrentTab("log")}
-                      className="w-full bg-white/10 py-3 rounded-xl mb-4"
-                    >
-                      Go to Log Tab
-                    </button>
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => setOnboardingStep(1)}
-                        className="flex-1 bg-white/10 py-3 rounded-xl"
-                      >
-                        Back
-                      </button>
-                      <button
-                        className="flex-1 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 py-3 rounded-xl opacity-50"
-                        disabled
-                      >
-                        Waiting...
-                      </button>
-                    </div>
-                  </>
-                )}
+  <>
+    <h3 className="text-xl font-semibold mb-2">Step 2: Log Activity 📝</h3>
+    <p className="text-white/70 mb-4">
+      Go to the Log tab and add at least one activity (hourly or bulk).
+    </p>
+    <button
+      onClick={() => {
+        // Close onboarding modal temporarily so user can access Log tab
+        setShowOnboarding(false);
+        setCurrentTab("log");
+        // We'll use a flag to know they're in logging mode
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("onboarding_logging", "true");
+        }
+      }}
+      className="w-full bg-white/10 py-3 rounded-xl mb-4"
+    >
+      Go to Log Tab
+    </button>
+    <p className="text-xs text-white/50 mb-4 text-center">
+      After logging, click the ✨ coach button to resume onboarding.
+    </p>
+    <div className="flex gap-3">
+      <button
+        onClick={() => setOnboardingStep(1)}
+        className="flex-1 bg-white/10 py-3 rounded-xl"
+      >
+        Back
+      </button>
+      <button
+        onClick={() => setOnboardingStep(3)}
+        className="flex-1 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 py-3 rounded-xl"
+      >
+        I've Logged It
+      </button>
+    </div>
+  </>
+)}
                 {onboardingStep === 3 && (
                   <>
                     <h3 className="text-xl font-semibold mb-2">🎉 Reward Unlocked!</h3>
