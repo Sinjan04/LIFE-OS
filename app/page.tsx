@@ -1030,6 +1030,13 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                       <span>Lv.{level}</span>
                       <span className="text-white/40">•</span>
                       <span>{rank.emoji} {rank.title}</span>
+                       <button
+                        onClick={() => setShowRpgInfo(true)}
+                        className="ml-1 w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-xs hover:bg-white/20 transition-colors"
+                        style={{ touchAction: "manipulation" }}
+                      >
+                        ?
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -2078,96 +2085,107 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                   </>
                 )}
                 {onboardingStep === 1 && (
-  <>
-    <h3 className="text-xl font-semibold mb-2">Step 1: Check-in ⚡</h3>
-    <p className="text-white/70 mb-4">How are you feeling today?</p>
-    
-    {/* Energy */}
-    <div className="mb-4">
-      <p className="text-sm text-white/60 mb-2">Energy</p>
-      <div className="flex gap-2">
-        {["low", "mid", "high"].map((level) => (
-          <button
-            key={level}
-            onClick={() => setPulseEnergy(level as any)}
-            className={`flex-1 py-2.5 rounded-xl border transition-all ${
-              pulseEnergy === level
-                ? "bg-gradient-to-r from-blue-500/40 to-cyan-500/40 border-white/40"
-                : "bg-white/5 border-white/15"
-            }`}
-            style={{ touchAction: "manipulation" }}
-          >
-            {level === "low" ? "🥱" : level === "mid" ? "😐" : "⚡"} {level}
-          </button>
-        ))}
-      </div>
-    </div>
+                  <>
+                    <h3 className="text-xl font-semibold mb-2">Step 1: Check-in ⚡</h3>
+                    <p className="text-white/70 mb-4">How are you feeling today?</p>
+                    
+                    {/* Energy */}
+                    <div className="mb-4">
+                      <p className="text-sm text-white/60 mb-2">Energy</p>
+                      <div className="grid grid-cols-4 gap-2">
+                        {[
+                          { value: "low", label: "🥱 Low" },
+                          { value: "mid", label: "😐 Mid" },
+                          { value: "high", label: "⚡ High" },
+                          { value: "drained", label: "🪫 Drained" },
+                        ].map(({ value, label }) => (
+                          <button
+                            key={value}
+                            onClick={() => setPulseEnergy(value as any)}
+                            className={`py-2.5 rounded-xl border text-sm transition-all ${
+                              pulseEnergy === value
+                                ? "bg-gradient-to-r from-blue-500/40 to-cyan-500/40 border-white/40"
+                                : "bg-white/5 border-white/15"
+                            }`}
+                            style={{ touchAction: "manipulation" }}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-    {/* Mood */}
-    <div className="mb-4">
-      <p className="text-sm text-white/60 mb-2">Mood</p>
-      <div className="flex gap-2">
-        {["😊", "😐", "😤"].map((mood) => (
-          <button
-            key={mood}
-            onClick={() => setPulseMood(mood as any)}
-            className={`flex-1 py-2.5 rounded-xl border text-xl ${
-              pulseMood === mood
-                ? "bg-gradient-to-r from-green-500/40 to-lime-500/40 border-white/40"
-                : "bg-white/5 border-white/15"
-            }`}
-            style={{ touchAction: "manipulation" }}
-          >
-            {mood}
-          </button>
-        ))}
-      </div>
-    </div>
+                    {/* Mood */}
+                    <div className="mb-4">
+                      <p className="text-sm text-white/60 mb-2">Mood</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {["😊", "😐", "😤", "😢", "🤩", "😴"].map((mood) => (
+                          <button
+                            key={mood}
+                            onClick={() => setPulseMood(mood as any)}
+                            className={`py-2.5 rounded-xl border text-xl ${
+                              pulseMood === mood
+                                ? "bg-gradient-to-r from-green-500/40 to-lime-500/40 border-white/40"
+                                : "bg-white/5 border-white/15"
+                            }`}
+                            style={{ touchAction: "manipulation" }}
+                          >
+                            {mood}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-    {/* Intention */}
-    <div className="mb-6">
-      <p className="text-sm text-white/60 mb-2">Intention</p>
-      <div className="flex gap-2">
-        {["Work", "Rest", "Balance"].map((intent) => (
-          <button
-            key={intent}
-            onClick={() => setPulseIntention(intent as any)}
-            className={`flex-1 py-2.5 rounded-xl border text-sm ${
-              pulseIntention === intent
-                ? "bg-gradient-to-r from-purple-500/40 to-pink-500/40 border-white/40"
-                : "bg-white/5 border-white/15"
-            }`}
-            style={{ touchAction: "manipulation" }}
-          >
-            {intent === "Work" ? "💼" : intent === "Rest" ? "🛋️" : "⚖️"} {intent}
-          </button>
-        ))}
-      </div>
-    </div>
+                    {/* Intention */}
+                    <div className="mb-6">
+                      <p className="text-sm text-white/60 mb-2">Intention</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { value: "Work", emoji: "💼" },
+                          { value: "Rest", emoji: "🛋️" },
+                          { value: "Balance", emoji: "⚖️" },
+                          { value: "Survive", emoji: "🧟" },
+                          { value: "Create", emoji: "🎨" },
+                        ].map(({ value, emoji }) => (
+                          <button
+                            key={value}
+                            onClick={() => setPulseIntention(value as any)}
+                            className={`py-2.5 rounded-xl border text-sm ${
+                              pulseIntention === value
+                                ? "bg-gradient-to-r from-purple-500/40 to-pink-500/40 border-white/40"
+                                : "bg-white/5 border-white/15"
+                            }`}
+                            style={{ touchAction: "manipulation" }}
+                          >
+                            {emoji} {value}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-    <div className="flex gap-3">
-      <button
-        onClick={() => setOnboardingStep(0)}
-        className="flex-1 bg-white/10 py-3 rounded-xl"
-      >
-        Back
-      </button>
-      <button
-        onClick={() => {
-          handlePulseSubmit();      // saves pulse to localStorage
-          setOnboardingStep(2);     // advance to next step
-        }}
-        disabled={!pulseEnergy || !pulseMood || !pulseIntention}
-        className={`flex-1 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 py-3 rounded-xl ${
-          !pulseEnergy || !pulseMood || !pulseIntention ? "opacity-50" : ""
-        }`}
-        style={{ touchAction: "manipulation" }}
-      >
-        Save & Continue
-      </button>
-    </div>
-  </>
-)}
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setOnboardingStep(0)}
+                        className="flex-1 bg-white/10 py-3 rounded-xl"
+                      >
+                        Back
+                      </button>
+                      <button
+                        onClick={() => {
+                          handlePulseSubmit();
+                          setOnboardingStep(2);
+                        }}
+                        disabled={!pulseEnergy || !pulseMood || !pulseIntention}
+                        className={`flex-1 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 py-3 rounded-xl ${
+                          !pulseEnergy || !pulseMood || !pulseIntention ? "opacity-50" : ""
+                        }`}
+                        style={{ touchAction: "manipulation" }}
+                      >
+                        Save & Continue
+                      </button>
+                    </div>
+                  </>
+                )}
                 {onboardingStep === 2 && (
   <>
     <h3 className="text-xl font-semibold mb-2">Step 2: Log Activity 📝</h3>
