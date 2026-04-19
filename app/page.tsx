@@ -2138,21 +2138,14 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                   </p>
                 </div>
 
-                                {/* Additional Scores */}
-                <div className="grid grid-cols-3 gap-3 mt-4">
-                  <div className="bg-white/5 rounded-xl p-3 text-center">
-                    <p className="text-xs text-white/50">Balance</p>
-                    <p className="text-xl font-bold text-purple-300">{balanceScore}</p>
-                  </div>
-                  <div className="bg-white/5 rounded-xl p-3 text-center">
-                    <p className="text-xs text-white/50">Focus</p>
-                    <p className="text-xl font-bold text-amber-300">{focusScore}</p>
-                  </div>
-                  <div className="bg-white/5 rounded-xl p-3 text-center">
-                    <p className="text-xs text-white/50">Recovery</p>
-                    <p className="text-xl font-bold text-teal-300">{recoveryScore}</p>
-                  </div>
-                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-950/80 to-black/60 backdrop-blur-xl border border-blue-400/40 p-8 hover:scale-[1.02] transition-transform">
+                    <div className="absolute -top-16 -right-16 w-32 h-32 bg-blue-500/40 rounded-full blur-3xl" />
+                    <p className="text-lg font-semibold text-blue-200/90 uppercase mb-2">Productivity</p>
+                    <p className="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-200">{actualScores.productivity}</p>
+                    <div className="mt-6 w-full h-3 bg-white/10 rounded-full">
+                      <div className={`h-full bg-gradient-to-r ${getProductivityColor(actualScores.productivity)}`} style={{ width: `${actualScores.productivity}%` }} />
+                    </div>
                     {projectedScores.productivity > 0 && (
                       <p className="text-sm text-blue-200/60 mt-2">Projected: {projectedScores.productivity}</p>
                     )}
@@ -2167,6 +2160,22 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                     {projectedScores.happiness > 0 && (
                       <p className="text-sm text-lime-200/60 mt-2">Projected: {projectedScores.happiness}</p>
                     )}
+                  </div>
+                </div>
+
+                {/* Additional Three Scores */}
+                <div className="grid grid-cols-3 gap-3 mt-4">
+                  <div className="bg-white/5 rounded-xl p-3 text-center">
+                    <p className="text-xs text-white/50">Balance</p>
+                    <p className="text-xl font-bold text-purple-300">{balanceScore}</p>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-3 text-center">
+                    <p className="text-xs text-white/50">Focus</p>
+                    <p className="text-xl font-bold text-amber-300">{focusScore}</p>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-3 text-center">
+                    <p className="text-xs text-white/50">Recovery</p>
+                    <p className="text-xl font-bold text-teal-300">{recoveryScore}</p>
                   </div>
                 </div>
 
@@ -2203,7 +2212,8 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
             </div>
           </>
         )}
-                {/* RPG Info Modal */}
+
+        {/* RPG Info Modal */}
         {showRpgInfo && (
           <>
             <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-50" onClick={() => setShowRpgInfo(false)} />
