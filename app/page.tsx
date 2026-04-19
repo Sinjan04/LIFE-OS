@@ -379,9 +379,10 @@ export default function Home() {
   const [showScoreModal, setShowScoreModal] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentTab, setCurrentTab] = useState<TabId>("home");
-  const [pulseEnergy, setPulseEnergy] = useState<"low" | "mid" | "high" | null>(null);
-  const [pulseMood, setPulseMood] = useState<"😊" | "😐" | "😤" | null>(null);
-  const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance" | null>(null);
+ // Replace the old pulse state lines with these expanded versions
+const [pulseEnergy, setPulseEnergy] = useState<"low" | "mid" | "high" | "drained" | null>(null);
+const [pulseMood, setPulseMood] = useState<"😊" | "😐" | "😤" | "😢" | "🤩" | "😴" | null>(null);
+const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance" | "Survive" | "Create" | null>(null);
   const [history, setHistory] = useState<Array<{ date: string; productivity: number; happiness: number; reflection?: string }>>([]);
   const [unlockedBadges, setUnlockedBadges] = useState<string[]>([]);
   const [newBadge, setNewBadge] = useState<string | null>(null);
@@ -684,6 +685,31 @@ export default function Home() {
     if (hoursMap["Sleep"] >= 7) return "Well rested = unstoppable 😴➡️⚡";
     return "Every log is a step forward 🌱";
   };
+  const getPulseFeedback = (
+  energy: typeof pulseEnergy,
+  mood: typeof pulseMood,
+  intention: typeof pulseIntention
+): { emoji: string; text: string } => {
+  if (!energy || !mood || !intention) return { emoji: "⚡", text: "Complete your pulse!" };
+  
+  const combos: Record<string, { emoji: string; text: string }> = {
+    "high_😊_Work": { emoji: "🚀", text: "Unstoppable! Today you're a productivity god." },
+    "high_😤_Work": { emoji: "😈", text: "Angry productivity. Channel that fire!" },
+    "high_😢_Work": { emoji: "😭💼", text: "Crying in the conference room. Power through." },
+    "mid_😐_Work": { emoji: "☕", text: "Just another day at the grind. Coffee helps." },
+    "low_😴_Work": { emoji: "🥱💻", text: "Wants to work but body says no. Fake it." },
+    "low_😢_Work": { emoji: "😩", text: "Wants to work but not willingly. We've all been there." },
+    "high_🤩_Create": { emoji: "🎨✨", text: "Creative explosion! Make something beautiful." },
+    "mid_😊_Balance": { emoji: "⚖️😌", text: "Perfect equilibrium. You're a zen master." },
+    "drained_😴_Survive": { emoji: "🧟", text: "Survival mode activated. Just get through it." },
+    "drained_😢_Rest": { emoji: "🛌😭", text: "You need a hug and a nap. Order doesn't matter." },
+    "high_🤩_Rest": { emoji: "🎉🛋️", text: "Excited to do nothing! Enjoy the laziness." },
+    "low_😤_Rest": { emoji: "😠🛌", text: "Forced rest. You're angry about relaxing." },
+  };
+  
+  const key = `${energy}_${mood}_${intention}`;
+  return combos[key] || { emoji: "✨", text: "Today is yours. Make it count." };
+};
 
   const handleHourSelect = (category: Category) => {
     if (selectedHour !== null) {
@@ -1044,90 +1070,125 @@ export default function Home() {
                 {pulseCompleted && <span className="text-green-400 text-sm">✓</span>}
               </h2>
               {!pulseCompleted ? (
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm text-white/60 mb-2">Energy</p>
-                    <div className="flex gap-2">
-                      {["low", "mid", "high"].map((level) => (
-                        <button
-                          key={level}
-                          onClick={() => setPulseEnergy(level as any)}
-                          className={`flex-1 py-2.5 rounded-xl border transition-all hover:scale-105 ${
-                            pulseEnergy === level
-                              ? "bg-gradient-to-r from-blue-500/40 to-cyan-500/40 border-white/40"
-                              : "bg-white/5 border-white/15"
-                          }`}
-                          style={{ touchAction: "manipulation" }}
-                        >
-                          {level === "low" ? "🥱" : level === "mid" ? "😐" : "⚡"} {level}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm text-white/60 mb-2">Mood</p>
-                    <div className="flex gap-2">
-                      {["😊", "😐", "😤"].map((mood) => (
-                        <button
-                          key={mood}
-                          onClick={() => setPulseMood(mood as any)}
-                          className={`flex-1 py-2.5 rounded-xl border text-xl hover:scale-105 transition-all ${
-                            pulseMood === mood
-                              ? "bg-gradient-to-r from-green-500/40 to-lime-500/40 border-white/40"
-                              : "bg-white/5 border-white/15"
-                          }`}
-                          style={{ touchAction: "manipulation" }}
-                        >
-                          {mood}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm text-white/60 mb-2">Intention</p>
-                    <div className="flex gap-2">
-                      {["Work", "Rest", "Balance"].map((intent) => (
-                        <button
-                          key={intent}
-                          onClick={() => setPulseIntention(intent as any)}
-                          className={`flex-1 py-2.5 rounded-xl border text-sm hover:scale-105 transition-all ${
-                            pulseIntention === intent
-                              ? "bg-gradient-to-r from-purple-500/40 to-pink-500/40 border-white/40"
-                              : "bg-white/5 border-white/15"
-                          }`}
-                          style={{ touchAction: "manipulation" }}
-                        >
-                          {intent === "Work" ? "💼" : intent === "Rest" ? "🛋️" : "⚖️"} {intent}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <button
-                    onClick={handlePulseSubmit}
-                    disabled={!pulseEnergy || !pulseMood || !pulseIntention}
-                    className="w-full bg-gradient-to-r from-blue-500/30 to-cyan-500/30 border border-white/30 rounded-xl py-3 font-medium disabled:opacity-30 hover:scale-[1.01] transition-all"
-                    style={{ touchAction: "manipulation" }}
-                  >
-                    Save Pulse
-                  </button>
-                </div>
+<div className="space-y-4">
+  <div>
+    <p className="text-sm text-white/60 mb-2">Energy</p>
+    <div className="grid grid-cols-4 gap-2">
+      {[
+        { value: "low", label: "🥱 Low" },
+        { value: "mid", label: "😐 Mid" },
+        { value: "high", label: "⚡ High" },
+        { value: "drained", label: "🪫 Drained" },
+      ].map(({ value, label }) => (
+        <button
+          key={value}
+          onClick={() => setPulseEnergy(value as any)}
+          className={`py-2.5 rounded-xl border text-sm transition-all ${
+            pulseEnergy === value
+              ? "bg-gradient-to-r from-blue-500/40 to-cyan-500/40 border-white/40"
+              : "bg-white/5 border-white/15"
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  </div>
+  <div>
+    <p className="text-sm text-white/60 mb-2">Mood</p>
+    <div className="grid grid-cols-3 gap-2">
+      {["😊", "😐", "😤", "😢", "🤩", "😴"].map((mood) => (
+        <button
+          key={mood}
+          onClick={() => setPulseMood(mood as any)}
+          className={`py-2.5 rounded-xl border text-xl ${
+            pulseMood === mood
+              ? "bg-gradient-to-r from-green-500/40 to-lime-500/40 border-white/40"
+              : "bg-white/5 border-white/15"
+          }`}
+        >
+          {mood}
+        </button>
+      ))}
+    </div>
+  </div>
+  <div>
+    <p className="text-sm text-white/60 mb-2">Intention</p>
+    <div className="grid grid-cols-3 gap-2">
+      {[
+        { value: "Work", emoji: "💼" },
+        { value: "Rest", emoji: "🛋️" },
+        { value: "Balance", emoji: "⚖️" },
+        { value: "Survive", emoji: "🧟" },
+        { value: "Create", emoji: "🎨" },
+      ].map(({ value, emoji }) => (
+        <button
+          key={value}
+          onClick={() => setPulseIntention(value as any)}
+          className={`py-2.5 rounded-xl border text-sm ${
+            pulseIntention === value
+              ? "bg-gradient-to-r from-purple-500/40 to-pink-500/40 border-white/40"
+              : "bg-white/5 border-white/15"
+          }`}
+        >
+          {emoji} {value}
+        </button>
+      ))}
+    </div>
+  </div>
+  <button
+    onClick={handlePulseSubmit}
+    disabled={!pulseEnergy || !pulseMood || !pulseIntention}
+    className="w-full bg-gradient-to-r from-blue-500/30 to-cyan-500/30 border border-white/30 rounded-xl py-3 font-medium disabled:opacity-30"
+  >
+    Save Pulse
+  </button>
+</div>
               ) : (
-                <div className="flex justify-around py-4">
-                  <div className="text-center">
-                    <span className="text-3xl">{pulseEnergy === "low" ? "🥱" : pulseEnergy === "mid" ? "😐" : "⚡"}</span>
-                    <p className="text-xs text-white/60 mt-1">Energy</p>
-                  </div>
-                  <div className="text-center">
-                    <span className="text-3xl">{pulseMood}</span>
-                    <p className="text-xs text-white/60 mt-1">Mood</p>
-                  </div>
-                  <div className="text-center">
-                    <span className="text-3xl">{pulseIntention === "Work" ? "💼" : pulseIntention === "Rest" ? "🛋️" : "⚖️"}</span>
-                    <p className="text-xs text-white/60 mt-1">{pulseIntention}</p>
-                  </div>
-                </div>
-              )}
-            </div>
+                {pulseCompleted ? (
+  <div className="py-2">
+    <div className="flex justify-around mb-4">
+      <div className="text-center">
+        <span className="text-3xl">
+          {pulseEnergy === "low" ? "🥱" : pulseEnergy === "mid" ? "😐" : pulseEnergy === "high" ? "⚡" : "🪫"}
+        </span>
+        <p className="text-xs text-white/60 mt-1 capitalize">{pulseEnergy}</p>
+      </div>
+      <div className="text-center">
+        <span className="text-3xl">{pulseMood}</span>
+        <p className="text-xs text-white/60 mt-1">Mood</p>
+      </div>
+      <div className="text-center">
+        <span className="text-3xl">
+          {pulseIntention === "Work" ? "💼" : pulseIntention === "Rest" ? "🛋️" : pulseIntention === "Balance" ? "⚖️" : pulseIntention === "Survive" ? "🧟" : "🎨"}
+        </span>
+        <p className="text-xs text-white/60 mt-1">{pulseIntention}</p>
+      </div>
+    </div>
+    {/* Witty Feedback */}
+    <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-400/30 rounded-xl p-3 text-center">
+      <p className="text-lg mb-1">{getPulseFeedback(pulseEnergy, pulseMood, pulseIntention).emoji}</p>
+      <p className="text-sm text-white/80 italic">
+        "{getPulseFeedback(pulseEnergy, pulseMood, pulseIntention).text}"
+      </p>
+    </div>
+    <button
+      onClick={() => {
+        setPulseEnergy(null);
+        setPulseMood(null);
+        setPulseIntention(null);
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("lifeos_pulse");
+        }
+      }}
+      className="w-full mt-3 text-xs text-white/50 hover:text-white/80 transition-colors"
+    >
+      Redo Pulse
+    </button>
+  </div>
+) : (
+  // ... the pulse input form remains unchanged (but we should also update its options)
+)}
 
             {/* Five Metrics Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -1167,6 +1228,48 @@ export default function Home() {
                 </div>
               </div>
             </div>
+              {/* Category Hours Bar Chart */}
+{totalHours > 0 && (
+  <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5 hover:scale-[1.01] transition-transform duration-200">
+    <h2 className="text-sm font-semibold mb-3 text-white/60 uppercase tracking-wider">Today's Time Allocation</h2>
+    <div className="space-y-2">
+      {Object.entries(hoursMap)
+        .filter(([_, hours]) => hours > 0)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5) // show top 5 categories
+        .map(([cat, hours]) => {
+          const percentage = (hours / totalHours) * 100;
+          const colorClass = 
+            cat === "Study" ? "bg-blue-400" :
+            cat === "Work" ? "bg-indigo-400" :
+            cat === "Gym" ? "bg-orange-400" :
+            cat === "Sports" ? "bg-red-400" :
+            cat === "Social" ? "bg-green-400" :
+            cat === "Rest" ? "bg-yellow-400" :
+            cat === "Sleep" ? "bg-purple-400" :
+            cat === "Personal Hobby" ? "bg-pink-400" :
+            cat === "Gaming" ? "bg-cyan-400" : "bg-gray-400";
+          return (
+            <div key={cat} className="flex items-center gap-2 text-xs">
+              <span className="w-20 truncate">{cat}</span>
+              <div className="flex-1 h-4 bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className={`h-full ${colorClass}`}
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+              <span className="w-10 text-right">{hours}h</span>
+            </div>
+          );
+        })}
+    </div>
+    {Object.keys(hoursMap).filter(k => hoursMap[k as Category] > 0).length > 5 && (
+      <p className="text-xs text-white/40 mt-2 text-center">
+        +{Object.keys(hoursMap).filter(k => hoursMap[k as Category] > 0).length - 5} more categories
+      </p>
+    )}
+  </div>
+)}
 
             {/* Weekly Challenges */}
             {challenges.length > 0 && (
@@ -1779,66 +1882,111 @@ export default function Home() {
           </div>
         )}
 
-        {/* Floating Coach Button (Phase 3) */}
-        <button
-          onClick={() => setShowCoachModal(true)}
-          className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg border border-white/30 flex items-center justify-center text-2xl animate-bounce-slow hover:scale-110 transition-transform"
-          style={{ touchAction: "manipulation" }}
-        >
-          ✨
-        </button>
-
-        {/* Coach Guide Modal */}
-        {showCoachModal && (
-          <>
-            <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-40" onClick={() => setShowCoachModal(false)} />
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-3xl p-6 w-full max-w-md max-h-[80vh] overflow-y-auto custom-scroll">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold flex items-center gap-2">
-                    <span>✨</span> Coach Guide
-                  </h3>
-                  <button onClick={() => setShowCoachModal(false)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20">✕</button>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="p-3 bg-blue-500/10 border border-blue-400/30 rounded-xl">
-                    <h4 className="font-medium text-blue-200 mb-1">🧭 How Life OS Works</h4>
-                    <p className="text-sm text-white/70">Log your daily activities → Get Productivity & Happiness scores → Level up, earn badges, and track your growth.</p>
-                  </div>
-                  <div className="p-3 bg-purple-500/10 border border-purple-400/30 rounded-xl">
-                    <h4 className="font-medium text-purple-200 mb-1">🎮 XP & Character System</h4>
-                    <p className="text-sm text-white/70">Every logged hour gives XP. Level up to unlock ranks. Stats grow based on activity types.</p>
-                  </div>
-                  <div className="p-3 bg-amber-500/10 border border-amber-400/30 rounded-xl">
-                    <h4 className="font-medium text-amber-200 mb-1">🪙 Token System</h4>
-                    <p className="text-sm text-white/70">Earn tokens from Study/Work/Gym. Spend on Gaming/Rest. Low tokens reduce happiness gain.</p>
-                  </div>
-                  <div className="p-3 bg-green-500/10 border border-green-400/30 rounded-xl">
-                    <h4 className="font-medium text-green-200 mb-1">📊 Scores Explained</h4>
-                    <p className="text-sm text-white/70">Productivity: Study, Work, Gym. Happiness: Social, Sleep, Hobbies. Balance = harmony.</p>
-                  </div>
-                  <div className="p-3 bg-pink-500/10 border border-pink-400/30 rounded-xl">
-                    <h4 className="font-medium text-pink-200 mb-1">🚀 How to Improve</h4>
-                    <p className="text-sm text-white/70">Plan goals, complete pulse, maintain streaks, and follow smart suggestions.</p>
-                  </div>
-                </div>
-                
-                {/* Smart Hint (contextual) */}
-                {totalLogs === 0 && (
-                  <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-xl">
-                    <p className="text-sm text-yellow-200">💡 Log your first activity to start earning XP!</p>
-                  </div>
-                )}
-                {plannedLogs.length === 0 && totalLogs > 0 && (
-                  <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-xl">
-                    <p className="text-sm text-yellow-200">💡 Plan your day in Goals tab for better focus.</p>
-                  </div>
-                )}
+       {/* Floating Coach Button with Label */}
+<div className="fixed bottom-6 right-6 z-40 flex flex-col items-center gap-1">
+  <button
+    onClick={() => {
+      if (typeof window !== "undefined" && sessionStorage.getItem("onboarding_logging") === "true") {
+        sessionStorage.removeItem("onboarding_logging");
+        setShowOnboarding(true);
+        setOnboardingStep(3);
+      } else {
+        setShowCoachModal(true);
+      }
+    }}
+    className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg border border-white/30 flex items-center justify-center text-2xl animate-bounce-slow hover:scale-110 transition-transform"
+    style={{ touchAction: "manipulation" }}
+  >
+    ✨
+  </button>
+  <span className="text-xs bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full text-white/80 border border-white/20">
+    Coach
+  </span>
+</div>
+            
+{/* Coach Guide Modal - Enhanced */}
+{showCoachModal && (
+  <>
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-40" onClick={() => setShowCoachModal(false)} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-3xl p-6 w-full max-w-lg max-h-[85vh] overflow-y-auto custom-scroll">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-2xl font-semibold flex items-center gap-2">
+            <span>✨</span> Life OS Guide
+          </h3>
+          <button onClick={() => setShowCoachModal(false)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20">✕</button>
+        </div>
+        
+        <div className="space-y-3">
+          {[
+            {
+              title: "🏠 Home Tab",
+              content: "Your dashboard. See scores, daily modifier, pulse, challenges, persona, and week view. The identity panel shows your level, XP, and tokens."
+            },
+            {
+              title: "⚡ Pulse Check-in",
+              content: "Log your energy, mood, and intention each day. Based on your combination, you'll get a witty, personalized feedback message. Redo anytime."
+            },
+            {
+              title: "📝 Log Tab",
+              content: "Track activities two ways: Hourly (time-block each hour) or Activity (bulk log hours). This builds your daily productivity and happiness scores."
+            },
+            {
+              title: "🎯 Goals Tab",
+              content: "Plan your ideal day. Compare projected scores vs actual at the end. Helps you set intentions and reflect on execution."
+            },
+            {
+              title: "📊 Insights Tab",
+              content: "Smart analysis of your last 7 days. See correlations (e.g., Gym → higher productivity) and a breakdown of where your scores come from."
+            },
+            {
+              title: "👤 Profile Tab",
+              content: "RPG character stats (INT, STR, CHA, VIT, SPR) grow as you log activities. View badges, set an accountability partner, and manage data."
+            },
+            {
+              title: "🎮 RPG & Leveling",
+              content: "Every logged hour gives 10 XP. Level up every 100 XP. Higher levels unlock new rank titles. Stats increase based on category: Study/Work = INT, Gym/Sports = STR, etc."
+            },
+            {
+              title: "🪙 Token Economy",
+              content: "Earn tokens from Study, Work, Gym. Spend them on Gaming or Rest. If you're out of tokens, happiness gain from those activities is halved."
+            },
+            {
+              title: "🧘 Daily Modifier",
+              content: "Each day has a random modifier (Monk Mode, Social Boost, Recovery Day) that multiplies productivity or happiness gains."
+            },
+            {
+              title: "🏅 Badges & Challenges",
+              content: "Unlock badges for milestones (streaks, high scores, category hours). Weekly challenges appear on Home to guide your focus."
+            },
+          ].map((item, idx) => (
+            <details key={idx} className="group bg-white/5 rounded-xl border border-white/10">
+              <summary className="p-4 font-medium cursor-pointer list-none flex items-center justify-between">
+                <span>{item.title}</span>
+                <span className="text-white/50 group-open:rotate-90 transition-transform">▶</span>
+              </summary>
+              <div className="px-4 pb-4 text-sm text-white/70 border-t border-white/10 pt-3">
+                {item.content}
               </div>
-            </div>
-          </>
+            </details>
+          ))}
+        </div>
+        
+        {/* Smart hint based on current state */}
+        {totalLogs === 0 && (
+          <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-xl">
+            <p className="text-sm text-yellow-200">💡 Tip: Start by logging an activity in the Log tab!</p>
+          </div>
         )}
+        {plannedLogs.length === 0 && totalLogs > 0 && (
+          <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-xl">
+            <p className="text-sm text-yellow-200">💡 Tip: Set daily goals in the Goals tab to stay focused.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  </>
+)}
 
         {/* Name Input Modal (First Visit) */}
         {showNameModal && (
