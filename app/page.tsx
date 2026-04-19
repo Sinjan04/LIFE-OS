@@ -43,6 +43,34 @@ const happinessMap: Record<Category, number> = {
   Other: 0,
 };
 
+// NEW: Token earning rates
+const tokenEarnMap: Record<Category, number> = {
+  Study: 10,
+  Work: 10,
+  Gym: 10,
+  Sports: 0,
+  Social: 0,
+  Rest: 0,
+  Sleep: 0,
+  "Personal Hobby": 0,
+  Gaming: -5, // negative = cost
+  Other: 0,
+};
+
+// NEW: RPG Stat mapping
+const statMap: Record<Category, "INT" | "STR" | "CHA" | "VIT" | "SPR" | null> = {
+  Study: "INT",
+  Work: "INT",
+  Gym: "STR",
+  Sports: "STR",
+  Social: "CHA",
+  Rest: "VIT",
+  Sleep: "VIT",
+  "Personal Hobby": "SPR",
+  Gaming: null,
+  Other: null,
+};
+
 const blockStyles: Record<Category, string> = {
   Study: "bg-gradient-to-r from-blue-900/30 to-blue-800/30 border-blue-400/40",
   Work: "bg-gradient-to-r from-indigo-900/30 to-indigo-800/30 border-indigo-400/40",
@@ -68,9 +96,36 @@ const tabs = [
 
 type TabId = (typeof tabs)[number]["id"];
 
+// NEW: Daily Modifier Type
+type ModifierType = "monk" | "social" | "recovery" | null;
+interface DailyModifier {
+  type: ModifierType;
+  name: string;
+  prodMultiplier: number;
+  happyMultiplier: number;
+  emoji: string;
+}
+
+// NEW: Get daily modifier based on date (deterministic)
+const getDailyModifier = (): DailyModifier => {
+  if (typeof window === "undefined") return { type: null, name: "", prodMultiplier: 1, happyMultiplier: 1, emoji: "" };
+  const today = getTodayDate();
+  const seed = today.split("-").join(""); // simple hash
+  const hash = parseInt(seed) % 3;
+  const modifiers: DailyModifier[] = [
+    { type: "monk", name: "Monk Mode", prodMultiplier: 1.5, happyMultiplier: 1.0, emoji: "🧘" },
+    { type: "social", name: "Social Boost", prodMultiplier: 1.0, happyMultiplier: 1.5, emoji: "🎉" },
+    { type: "recovery", name: "Recovery Day", prodMultiplier: 0.8, happyMultiplier: 1.2, emoji: "🛌" },
+  ];
+  return modifiers[hash];
+};
+
+// Updated calculateScores to include daily modifier and token penalty
 const calculateScores = (
   timelineData: { [hour: number]: Category },
-  activityLogs: Array<{ category: Category; hours: number }>
+  activityLogs: Array<{ category: Category; hours: number }>,
+  modifier: DailyModifier,
+  tokenBalance: number
 ) => {
   let productivity = 0;
   let happiness = 0;
@@ -79,9 +134,24 @@ const calculateScores = (
     happiness += happinessMap[cat] || 0;
   });
   activityLogs.forEach(({ category, hours }) => {
-    productivity += (productivityMap[category] || 0) * hours;
-    happiness += (happinessMap[category] || 0) * hours;
+    let prodGain = (productivityMap[category] || 0) * hours;
+    let happyGain = (happinessMap[category] || 0) * hours;
+    
+    // Apply token penalty for activities that cost tokens (Gaming/Rest)
+    const tokenCost = tokenEarnMap[category] || 0;
+    if (tokenCost < 0 && tokenBalance + tokenCost < 0) {
+      // Insufficient tokens: halve happiness gain
+      happyGain *= 0.5;
+    }
+    
+    productivity += prodGain;
+    happiness += happyGain;
   });
+  
+  // Apply daily modifier multipliers
+  productivity *= modifier.prodMultiplier;
+  happiness *= modifier.happyMultiplier;
+  
   return {
     productivity: Math.min(100, Math.round(productivity)),
     happiness: Math.min(100, Math.round(happiness)),
@@ -287,6 +357,14 @@ const generateChallenges = (
   return challenges.slice(0, 3);
 };
 
+// NEW: Rank function
+const getRank = (level: number): { title: string; emoji: string } => {
+  if (level <= 5) return { title: "Beginner", emoji: "🌱" };
+  if (level <= 10) return { title: "Builder", emoji: "🏗️" };
+  if (level <= 20) return { title: "Strategist", emoji: "🧠" };
+  return { title: "Elite", emoji: "🚀" };
+};
+
 export default function Home() {
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const [selectedHour, setSelectedHour] = useState<number | null>(null);
@@ -312,6 +390,21 @@ export default function Home() {
   const [showReflectionModal, setShowReflectionModal] = useState(false);
   const [partnerName, setPartnerName] = useState("");
   const [soundEnabled, setSoundEnabled] = useState(true);
+  
+  // NEW: Identity & Onboarding states
+  const [userName, setUserName] = useState<string>("");
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(0);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showCoachModal, setShowCoachModal] = useState(false);
+  const [totalXP, setTotalXP] = useState(0);
+  const [tokenBalance, setTokenBalance] = useState(0);
+  const [prevLevel, setPrevLevel] = useState(0);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  
+  const dailyModifier = getDailyModifier();
+  const level = Math.floor(totalXP / 100);
+  const rank = getRank(level);
 
   // Load all data
   useEffect(() => {
@@ -340,6 +433,22 @@ export default function Home() {
         if (savedPartner) setPartnerName(savedPartner);
         const savedSound = localStorage.getItem("lifeos_sound");
         if (savedSound !== null) setSoundEnabled(JSON.parse(savedSound));
+        
+        // NEW: Load identity data
+        const savedName = localStorage.getItem("lifeos_username");
+        if (savedName) {
+          setUserName(savedName);
+        } else {
+          setShowNameModal(true);
+        }
+        const savedXP = localStorage.getItem("lifeos_xp");
+        if (savedXP) setTotalXP(JSON.parse(savedXP));
+        const savedTokens = localStorage.getItem("lifeos_tokens");
+        if (savedTokens) setTokenBalance(JSON.parse(savedTokens));
+        const onboarded = localStorage.getItem("lifeos_onboarded");
+        if (!onboarded && savedName) {
+          setShowOnboarding(true);
+        }
       } catch {}
       setIsLoaded(true);
     }
@@ -397,6 +506,30 @@ export default function Home() {
       localStorage.setItem("lifeos_sound", JSON.stringify(soundEnabled));
     }
   }, [soundEnabled, isLoaded]);
+  
+  // NEW: Persist XP and tokens
+  useEffect(() => {
+    if (isLoaded && typeof window !== "undefined") {
+      localStorage.setItem("lifeos_xp", JSON.stringify(totalXP));
+    }
+  }, [totalXP, isLoaded]);
+  
+  useEffect(() => {
+    if (isLoaded && typeof window !== "undefined") {
+      localStorage.setItem("lifeos_tokens", JSON.stringify(tokenBalance));
+    }
+  }, [tokenBalance, isLoaded]);
+  
+  // NEW: Check for level up
+  useEffect(() => {
+    if (level > prevLevel && prevLevel > 0) {
+      setShowLevelUp(true);
+      triggerConfetti();
+      if (soundEnabled) playSound("badge");
+      setTimeout(() => setShowLevelUp(false), 4000);
+    }
+    setPrevLevel(level);
+  }, [level, prevLevel, soundEnabled]);
 
   const savePulse = () => {
     if (typeof window !== "undefined" && pulseEnergy && pulseMood && pulseIntention) {
@@ -409,8 +542,32 @@ export default function Home() {
     }
   };
 
-  const actualScores = calculateScores(timelineData, activityLogs);
-  const projectedScores = calculateScores({}, plannedLogs);
+  // Compute XP from current logs (used for updates)
+  const computeXPFromLogs = useCallback(() => {
+    let xp = 0;
+    Object.values(timelineData).forEach(cat => {
+      if (statMap[cat]) xp += 10;
+    });
+    activityLogs.forEach(({ category, hours }) => {
+      if (statMap[category]) xp += hours * 10;
+    });
+    return xp;
+  }, [timelineData, activityLogs]);
+  
+  // Compute token delta from current logs
+  const computeTokenDelta = useCallback(() => {
+    let delta = 0;
+    Object.values(timelineData).forEach(cat => {
+      delta += tokenEarnMap[cat] || 0;
+    });
+    activityLogs.forEach(({ category, hours }) => {
+      delta += (tokenEarnMap[category] || 0) * hours;
+    });
+    return delta;
+  }, [timelineData, activityLogs]);
+
+  const actualScores = calculateScores(timelineData, activityLogs, dailyModifier, tokenBalance);
+  const projectedScores = calculateScores({}, plannedLogs, dailyModifier, tokenBalance);
   const { breakdown, hoursMap } = getBreakdown(timelineData, activityLogs);
   const streaks = computeStreaks(history);
   const totalLogs = Object.keys(timelineData).length + activityLogs.length;
@@ -533,6 +690,11 @@ export default function Home() {
       setTimelineData({ ...timelineData, [selectedHour]: category });
       setSelectedHour(null);
       if (soundEnabled) playSound("log");
+      
+      // Onboarding step: after first log, move to reward step
+      if (showOnboarding && onboardingStep === 2) {
+        setOnboardingStep(3);
+      }
     }
   };
 
@@ -540,8 +702,12 @@ export default function Home() {
     const hours = parseInt(hoursInput);
     if (!isNaN(hours) && hours > 0 && hours <= 12) {
       setActivityLogs([...activityLogs, { category: selectedCategory, hours }]);
-      setHoursInput("1"); // reset to default
+      setHoursInput("1");
       if (soundEnabled) playSound("log");
+      
+      if (showOnboarding && onboardingStep === 2) {
+        setOnboardingStep(3);
+      }
     }
   };
 
@@ -585,11 +751,17 @@ export default function Home() {
   };
 
   const handleDoneClick = () => {
-    // Validate that there is at least some activity logged
     if (Object.keys(timelineData).length === 0 && activityLogs.length === 0) {
       alert("Please log at least one activity or hourly block before finishing.");
       return;
     }
+    
+    // Update XP and Tokens
+    const newXP = totalXP + computeXPFromLogs();
+    setTotalXP(newXP);
+    const tokenDelta = computeTokenDelta();
+    setTokenBalance(prev => prev + tokenDelta);
+    
     saveTodayScore();
     checkBadges();
     setShowScoreModal(true);
@@ -614,6 +786,9 @@ export default function Home() {
 
   const handlePulseSubmit = () => {
     savePulse();
+    if (showOnboarding && onboardingStep === 1) {
+      setOnboardingStep(2);
+    }
   };
 
   const exportData = () => {
@@ -625,6 +800,9 @@ export default function Home() {
       unlockedBadges,
       partnerName,
       pulse: { energy: pulseEnergy, mood: pulseMood, intention: pulseIntention },
+      userName,
+      totalXP,
+      tokenBalance,
     };
     const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -652,6 +830,9 @@ export default function Home() {
           setPulseMood(data.pulse.mood);
           setPulseIntention(data.pulse.intention);
         }
+        if (data.userName) setUserName(data.userName);
+        if (data.totalXP) setTotalXP(data.totalXP);
+        if (data.tokenBalance) setTokenBalance(data.tokenBalance);
       } catch (err) {
         alert("Invalid backup file.");
       }
@@ -659,10 +840,8 @@ export default function Home() {
     reader.readAsText(file);
   };
 
-  // Helper to handle hours input change (text)
   const handleHoursInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    // Allow empty string, numbers only
     if (val === "" || /^\d*$/.test(val)) {
       setHoursInput(val);
     }
@@ -674,10 +853,41 @@ export default function Home() {
       setPlannedHours(val);
     }
   };
+  
+  // NEW: Handle name save
+  const handleNameSave = () => {
+    if (userName.trim()) {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("lifeos_username", userName);
+      }
+      setShowNameModal(false);
+      setShowOnboarding(true);
+      setOnboardingStep(0);
+    }
+  };
+  
+  // NEW: Complete onboarding
+  const completeOnboarding = () => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("lifeos_onboarded", "true");
+    }
+    setShowOnboarding(false);
+    setOnboardingStep(0);
+  };
 
   const currentBadge = badgesList.find((b) => b.id === newBadge);
   const pulseCompleted = pulseEnergy && pulseMood && pulseIntention;
   const last7DaysData = [...history].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 7).reverse();
+  
+  // NEW: RPG stats calculation
+  const rpgStats = {
+    INT: (hoursMap["Study"] || 0) + (hoursMap["Work"] || 0),
+    STR: (hoursMap["Gym"] || 0) + (hoursMap["Sports"] || 0),
+    CHA: hoursMap["Social"] || 0,
+    VIT: (hoursMap["Sleep"] || 0) + (hoursMap["Rest"] || 0),
+    SPR: hoursMap["Personal Hobby"] || 0,
+  };
+  const maxStat = Math.max(...Object.values(rpgStats), 1);
 
   return (
     <>
@@ -700,6 +910,19 @@ export default function Home() {
       </div>
 
       <div className="relative text-white min-h-screen px-4 py-6 sm:px-6 sm:py-8 font-sans antialiased pb-8">
+        {/* Level Up Celebration */}
+        {showLevelUp && (
+          <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 animate-bounce-in">
+            <div className="bg-gradient-to-r from-purple-500/90 to-pink-500/90 backdrop-blur-xl border border-purple-300 rounded-2xl px-6 py-4 shadow-2xl flex items-center gap-3">
+              <span className="text-4xl">⬆️</span>
+              <div>
+                <p className="font-bold text-white">Level Up!</p>
+                <p className="text-sm text-white/90">You are now Level {level}</p>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {showCelebration && currentBadge && (
           <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 animate-bounce-in">
             <div className="bg-gradient-to-r from-yellow-500/90 to-amber-500/90 backdrop-blur-xl border border-yellow-300 rounded-2xl px-6 py-4 shadow-2xl flex items-center gap-3">
@@ -708,6 +931,18 @@ export default function Home() {
                 <p className="font-bold text-black">Badge Unlocked!</p>
                 <p className="text-sm text-black/80">{currentBadge.name}</p>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Daily Modifier Banner */}
+        {dailyModifier.type && (
+          <div className="max-w-2xl mx-auto mb-3">
+            <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-sm border border-purple-400/40 rounded-full px-4 py-2 text-center text-sm">
+              <span className="mr-2">{dailyModifier.emoji}</span>
+              <span className="font-medium">{dailyModifier.name}</span>
+              <span className="mx-2 text-white/50">|</span>
+              <span>Prod {dailyModifier.prodMultiplier}x · Happy {dailyModifier.happyMultiplier}x</span>
             </div>
           </div>
         )}
@@ -749,6 +984,39 @@ export default function Home() {
         {/* Tab Content */}
         {currentTab === "home" && (
           <div className="max-w-2xl mx-auto space-y-5">
+            {/* NEW: Identity Panel */}
+            <div className="bg-gradient-to-r from-blue-950/40 to-purple-950/40 backdrop-blur-xl border border-white/20 rounded-2xl p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">👤</span>
+                  <div>
+                    <p className="font-semibold text-lg">{userName || "Traveler"}</p>
+                    <div className="flex items-center gap-2 text-sm">
+                      <span>Lv.{level}</span>
+                      <span className="text-white/40">•</span>
+                      <span>{rank.emoji} {rank.title}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-2">
+                    <span className="text-yellow-400">✨</span>
+                    <span className="font-semibold">{totalXP} XP</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-amber-400">🪙</span>
+                    <span>{tokenBalance}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-2 w-full h-1.5 bg-white/10 rounded-full">
+                <div 
+                  className="h-full bg-gradient-to-r from-blue-400 to-purple-400 rounded-full transition-all"
+                  style={{ width: `${(totalXP % 100)}%` }}
+                />
+              </div>
+            </div>
+
             {/* Streaks + Partner */}
             <div className="flex justify-center gap-6">
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/15 rounded-full px-5 py-2 hover:scale-105 transition-transform duration-200">
@@ -1137,8 +1405,7 @@ export default function Home() {
             </div>
           </div>
         )}
-
-        {currentTab === "goals" && (
+                {currentTab === "goals" && (
           <div className="max-w-2xl mx-auto">
             <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5">
               <div className="flex items-center justify-between mb-4">
@@ -1220,6 +1487,7 @@ export default function Home() {
 
         {currentTab === "insights" && (
           <div className="max-w-2xl mx-auto space-y-5">
+            {/* Planned vs Actual */}
             <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5 hover:scale-[1.01] transition-transform duration-200">
               <h2 className="text-lg font-semibold mb-4 text-white/80">📋 Planned vs Actual</h2>
               <div className="space-y-3">
@@ -1257,6 +1525,45 @@ export default function Home() {
                   </p>
                 </div>
               </div>
+            </div>
+
+            {/* Smart Insights (Phase 7) */}
+            <div className="bg-gradient-to-r from-cyan-950/40 to-blue-950/40 backdrop-blur-xl border border-cyan-400/30 rounded-3xl p-5 hover:scale-[1.01] transition-transform">
+              <h2 className="text-lg font-semibold mb-4 text-white/80 flex items-center gap-2">
+                <span>🧠 Smart Insights</span>
+                <span className="text-xs bg-cyan-500/20 px-2 py-0.5 rounded-full">Last 7 Days</span>
+              </h2>
+              {history.length >= 3 ? (
+                <div className="space-y-3">
+                  {(() => {
+                    const last7 = [...history].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,7);
+                    const avgProd = last7.reduce((s,d)=>s+d.productivity,0)/last7.length;
+                    const avgHappy = last7.reduce((s,d)=>s+d.happiness,0)/last7.length;
+                    const gymDays = last7.filter(d => d.productivity > 60).length; // proxy
+                    const insights = [];
+                    if (hoursMap["Gym"] > 0 && actualScores.productivity > avgProd) {
+                      insights.push({ emoji: "💪", text: "Gym days boost your productivity by ~15%" });
+                    }
+                    if (hoursMap["Sleep"] >= 7 && actualScores.happiness > avgHappy) {
+                      insights.push({ emoji: "😴", text: "Sleep >7h correlates with higher happiness" });
+                    }
+                    if (hoursMap["Social"] > 2 && actualScores.happiness > 70) {
+                      insights.push({ emoji: "🫂", text: "Social time lifts your mood significantly" });
+                    }
+                    if (insights.length === 0) {
+                      insights.push({ emoji: "📊", text: "Log more days to unlock personalized insights" });
+                    }
+                    return insights.slice(0,2).map((insight, i) => (
+                      <div key={i} className="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span className="text-xl">{insight.emoji}</span>
+                        <p className="text-sm text-white/80">{insight.text}</p>
+                      </div>
+                    ));
+                  })()}
+                </div>
+              ) : (
+                <p className="text-white/50 text-center py-4">Log at least 3 days for smart insights</p>
+              )}
             </div>
 
             {/* Mood-Energy Correlation */}
@@ -1341,6 +1648,41 @@ export default function Home() {
 
         {currentTab === "profile" && (
           <div className="max-w-2xl mx-auto space-y-5">
+            {/* RPG Character Stats Card */}
+            <div className="bg-gradient-to-br from-purple-950/60 to-indigo-950/60 backdrop-blur-xl border border-purple-400/30 rounded-3xl p-5">
+              <h2 className="text-lg font-semibold mb-3 text-white/80 flex items-center gap-2">
+                <span>🎮 Character Stats</span>
+                <span className="text-xs bg-purple-500/20 px-2 py-0.5 rounded-full">RPG</span>
+              </h2>
+              <div className="space-y-3">
+                {Object.entries(rpgStats).map(([stat, value]) => (
+                  <div key={stat}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="flex items-center gap-1">
+                        {stat === "INT" && "🧠"} {stat === "STR" && "💪"} {stat === "CHA" && "🫂"} {stat === "VIT" && "❤️"} {stat === "SPR" && "✨"}
+                        {stat}
+                      </span>
+                      <span>{value}</span>
+                    </div>
+                    <div className="w-full h-2 bg-white/10 rounded-full">
+                      <div 
+                        className={`h-full rounded-full ${
+                          stat === "INT" ? "bg-blue-400" :
+                          stat === "STR" ? "bg-red-400" :
+                          stat === "CHA" ? "bg-green-400" :
+                          stat === "VIT" ? "bg-purple-400" : "bg-pink-400"
+                        }`}
+                        style={{ width: `${Math.min(100, (value / maxStat) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-white/50 mt-4 text-center">
+                Gain XP by logging activities. 10 XP per hour.
+              </p>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               {[
                 { label: "Total Hours", value: `${totalHours}h` },
@@ -1437,6 +1779,203 @@ export default function Home() {
           </div>
         )}
 
+        {/* Floating Coach Button (Phase 3) */}
+        <button
+          onClick={() => setShowCoachModal(true)}
+          className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg border border-white/30 flex items-center justify-center text-2xl animate-bounce-slow hover:scale-110 transition-transform"
+          style={{ touchAction: "manipulation" }}
+        >
+          ✨
+        </button>
+
+        {/* Coach Guide Modal */}
+        {showCoachModal && (
+          <>
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-40" onClick={() => setShowCoachModal(false)} />
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-3xl p-6 w-full max-w-md max-h-[80vh] overflow-y-auto custom-scroll">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold flex items-center gap-2">
+                    <span>✨</span> Coach Guide
+                  </h3>
+                  <button onClick={() => setShowCoachModal(false)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20">✕</button>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="p-3 bg-blue-500/10 border border-blue-400/30 rounded-xl">
+                    <h4 className="font-medium text-blue-200 mb-1">🧭 How Life OS Works</h4>
+                    <p className="text-sm text-white/70">Log your daily activities → Get Productivity & Happiness scores → Level up, earn badges, and track your growth.</p>
+                  </div>
+                  <div className="p-3 bg-purple-500/10 border border-purple-400/30 rounded-xl">
+                    <h4 className="font-medium text-purple-200 mb-1">🎮 XP & Character System</h4>
+                    <p className="text-sm text-white/70">Every logged hour gives XP. Level up to unlock ranks. Stats grow based on activity types.</p>
+                  </div>
+                  <div className="p-3 bg-amber-500/10 border border-amber-400/30 rounded-xl">
+                    <h4 className="font-medium text-amber-200 mb-1">🪙 Token System</h4>
+                    <p className="text-sm text-white/70">Earn tokens from Study/Work/Gym. Spend on Gaming/Rest. Low tokens reduce happiness gain.</p>
+                  </div>
+                  <div className="p-3 bg-green-500/10 border border-green-400/30 rounded-xl">
+                    <h4 className="font-medium text-green-200 mb-1">📊 Scores Explained</h4>
+                    <p className="text-sm text-white/70">Productivity: Study, Work, Gym. Happiness: Social, Sleep, Hobbies. Balance = harmony.</p>
+                  </div>
+                  <div className="p-3 bg-pink-500/10 border border-pink-400/30 rounded-xl">
+                    <h4 className="font-medium text-pink-200 mb-1">🚀 How to Improve</h4>
+                    <p className="text-sm text-white/70">Plan goals, complete pulse, maintain streaks, and follow smart suggestions.</p>
+                  </div>
+                </div>
+                
+                {/* Smart Hint (contextual) */}
+                {totalLogs === 0 && (
+                  <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-xl">
+                    <p className="text-sm text-yellow-200">💡 Log your first activity to start earning XP!</p>
+                  </div>
+                )}
+                {plannedLogs.length === 0 && totalLogs > 0 && (
+                  <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-xl">
+                    <p className="text-sm text-yellow-200">💡 Plan your day in Goals tab for better focus.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Name Input Modal (First Visit) */}
+        {showNameModal && (
+          <>
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-50" />
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-3xl p-6 w-full max-w-sm">
+                <h3 className="text-xl font-semibold mb-2">Welcome to Life OS</h3>
+                <p className="text-sm text-white/60 mb-4">What should we call you?</p>
+                <input
+                  type="text"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  placeholder="Your name"
+                  className="w-full bg-black/30 border border-white/20 rounded-xl p-3 text-white mb-4"
+                  autoFocus
+                />
+                <button
+                  onClick={handleNameSave}
+                  disabled={!userName.trim()}
+                  className="w-full bg-gradient-to-r from-blue-500/40 to-cyan-500/40 border border-white/30 rounded-xl py-3 font-medium disabled:opacity-30"
+                  style={{ touchAction: "manipulation" }}
+                >
+                  Let's Go
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Onboarding Walkthrough Modal (Phase 2) */}
+        {showOnboarding && (
+          <>
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-50" />
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-3xl p-6 w-full max-w-sm">
+                {onboardingStep === 0 && (
+                  <>
+                    <h3 className="text-2xl font-bold mb-2">Welcome, {userName}! 🌱</h3>
+                    <p className="text-white/70 mb-6">Let's set up your journey. This will take 1 minute.</p>
+                    <button
+                      onClick={() => setOnboardingStep(1)}
+                      className="w-full bg-gradient-to-r from-green-500/40 to-lime-500/40 py-3 rounded-xl"
+                      style={{ touchAction: "manipulation" }}
+                    >
+                      Get Started
+                    </button>
+                  </>
+                )}
+                {onboardingStep === 1 && (
+                  <>
+                    <h3 className="text-xl font-semibold mb-2">Step 1: Check-in ⚡</h3>
+                    <p className="text-white/70 mb-4">Complete your daily pulse: Energy, Mood, Intention.</p>
+                    <div className="bg-blue-500/10 border border-blue-400/30 rounded-xl p-3 mb-4">
+                      <p className="text-sm">Find this card on the Home tab. Tap each option.</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setOnboardingStep(0)}
+                        className="flex-1 bg-white/10 py-3 rounded-xl"
+                      >
+                        Back
+                      </button>
+                      <button
+                        onClick={handlePulseSubmit}
+                        className={`flex-1 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 py-3 rounded-xl ${!pulseCompleted && "opacity-50"}`}
+                        disabled={!pulseCompleted}
+                        style={{ touchAction: "manipulation" }}
+                      >
+                        {pulseCompleted ? "Next" : "Complete Pulse"}
+                      </button>
+                    </div>
+                  </>
+                )}
+                {onboardingStep === 2 && (
+                  <>
+                    <h3 className="text-xl font-semibold mb-2">Step 2: Log Activity 📝</h3>
+                    <p className="text-white/70 mb-4">Go to the Log tab and add one activity.</p>
+                    <button
+                      onClick={() => setCurrentTab("log")}
+                      className="w-full bg-white/10 py-3 rounded-xl mb-4"
+                    >
+                      Go to Log Tab
+                    </button>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setOnboardingStep(1)}
+                        className="flex-1 bg-white/10 py-3 rounded-xl"
+                      >
+                        Back
+                      </button>
+                      <button
+                        className="flex-1 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 py-3 rounded-xl opacity-50"
+                        disabled
+                      >
+                        Waiting...
+                      </button>
+                    </div>
+                  </>
+                )}
+                {onboardingStep === 3 && (
+                  <>
+                    <h3 className="text-xl font-semibold mb-2">🎉 Reward Unlocked!</h3>
+                    <p className="text-white/70 mb-4">You earned the "First Steps" badge!</p>
+                    <div className="text-center text-6xl mb-4">🎯</div>
+                    <button
+                      onClick={() => setOnboardingStep(4)}
+                      className="w-full bg-gradient-to-r from-yellow-500/40 to-amber-500/40 py-3 rounded-xl"
+                      style={{ touchAction: "manipulation" }}
+                    >
+                      Next
+                    </button>
+                  </>
+                )}
+                {onboardingStep === 4 && (
+                  <>
+                    <h3 className="text-xl font-semibold mb-2">Meet Your Coach ✨</h3>
+                    <p className="text-white/70 mb-4">Tap the ✨ button anytime for guidance.</p>
+                    <div className="flex justify-center mb-6">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl animate-pulse">
+                        ✨
+                      </div>
+                    </div>
+                    <button
+                      onClick={completeOnboarding}
+                      className="w-full bg-gradient-to-r from-green-500/40 to-lime-500/40 py-3 rounded-xl"
+                      style={{ touchAction: "manipulation" }}
+                    >
+                      Start Your Journey
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+
         {/* Reflection Modal */}
         {showReflectionModal && (
           <>
@@ -1472,13 +2011,29 @@ export default function Home() {
           </>
         )}
 
-        {/* Score Modal */}
+        {/* Score Modal (Phase 8: Daily Verdict) */}
         {showScoreModal && (
           <>
             <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-40 animate-fade-in" onClick={handleScoreModalClose} />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-scale-up">
               <div className="w-full max-w-lg">
                 <button onClick={handleScoreModalClose} className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/80 hover:bg-white/20 hover:scale-110 transition-all z-50" style={{ touchAction: "manipulation" }}>✕</button>
+                
+                {/* Verdict Title */}
+                <div className="text-center mb-6">
+                  <h2 className="text-3xl font-bold">
+                    {actualScores.productivity >= 70 && actualScores.happiness >= 70 ? "⚖️ Balanced" :
+                     actualScores.productivity >= 70 ? "🏗️ Overworked" :
+                     actualScores.happiness >= 70 ? "🦋 Joyful" : "🌱 Underperformed"}
+                  </h2>
+                  <p className="text-white/60 mt-1">
+                    {actualScores.productivity >= 70 && actualScores.happiness >= 70 ? "You're in harmony. Keep this rhythm." :
+                     actualScores.productivity >= 70 ? "Crushing work, but watch your happiness." :
+                     actualScores.happiness >= 70 ? "Great mood! Maybe channel some into productivity." :
+                     "Today was light. Tomorrow is a fresh start."}
+                  </p>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-950/80 to-black/60 backdrop-blur-xl border border-blue-400/40 p-8 hover:scale-[1.02] transition-transform">
                     <div className="absolute -top-16 -right-16 w-32 h-32 bg-blue-500/40 rounded-full blur-3xl" />
@@ -1503,9 +2058,35 @@ export default function Home() {
                     )}
                   </div>
                 </div>
-                <div className="mt-8 text-center">
+
+                {/* Goals vs Actual summary */}
+                {plannedLogs.length > 0 && (
+                  <div className="mt-6 p-4 bg-white/5 rounded-2xl border border-white/10">
+                    <p className="text-sm font-medium mb-2">Goals vs Actual</p>
+                    <div className="flex justify-between text-sm">
+                      <span>Productivity: {projectedScores.productivity} → {actualScores.productivity}</span>
+                      <span className={prodDiff >= 0 ? "text-green-400" : "text-red-400"}>
+                        {prodDiff >= 0 ? "+" : ""}{prodDiff}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm mt-1">
+                      <span>Happiness: {projectedScores.happiness} → {actualScores.happiness}</span>
+                      <span className={happyDiff >= 0 ? "text-green-400" : "text-red-400"}>
+                        {happyDiff >= 0 ? "+" : ""}{happyDiff}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-6 text-center">
                   <p className="text-xl font-medium text-white/90">{getFeedbackMessage(actualScores.productivity, actualScores.happiness)}</p>
                   <p className="text-sm text-white/50 mt-2">{getDailyInsight()}</p>
+                  <button
+                    onClick={handleScoreModalClose}
+                    className="mt-4 px-6 py-2 bg-white/10 rounded-full hover:bg-white/20 transition-all"
+                  >
+                    Continue
+                  </button>
                 </div>
               </div>
             </div>
@@ -1561,6 +2142,8 @@ export default function Home() {
         .animate-spin-slower { animation: spin-slower 30s linear infinite; }
         @keyframes fade-in-up { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
         .animate-fade-in-up { animation: fade-in-up 0.8s ease-out forwards; }
+        @keyframes bounce-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .animate-bounce-slow { animation: bounce-slow 2s ease-in-out infinite; }
       `}</style>
     </>
   );
