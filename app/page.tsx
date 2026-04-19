@@ -97,6 +97,7 @@ const tabs = [
   { id: "goals", label: "Goals", emoji: "🎯" },
   { id: "insights", label: "Insights", emoji: "📊" },
   { id: "profile", label: "Profile", emoji: "👤" },
+  { id: "guide", label: "Guide", emoji: "📖" }, // NEW
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -1052,7 +1053,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
             </div>
 
             {/* 2. Today's Scores Grid */}
-            <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-3xl p-4">
+            <div className="bg-gradient-to-br from-slate-900/60 to-black/40 backdrop-blur-xl border border-slate-700/50 rounded-3xl p-4">
               <h2 className="text-sm font-semibold mb-3 text-white/60 uppercase tracking-wider flex items-center gap-2">
                 <span>📊 Today's Scores</span>
               </h2>
@@ -1096,7 +1097,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
 
             {/* 3. Daily Modifier */}
             {dailyModifier.type && (
-              <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-sm border border-purple-400/40 rounded-full px-4 py-2 text-center text-sm">
+                          <div className="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 backdrop-blur-sm border border-indigo-400/40 rounded-full px-4 py-2 text-center text-sm">
                 <span className="mr-2">{dailyModifier.emoji}</span>
                 <span className="font-medium">{dailyModifier.name}</span>
                 <span className="mx-2 text-white/50">|</span>
@@ -1105,7 +1106,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
             )}
 
             {/* 4. Pulse (compact) */}
-            <div className="bg-gradient-to-br from-amber-950/20 to-orange-950/20 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
+                        <div className="bg-gradient-to-br from-amber-950/40 to-orange-950/30 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium text-white/70">⚡ Pulse</h3>
                 {pulseCompleted && <span className="text-green-400 text-xs">✓</span>}
@@ -1146,7 +1147,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
             </div>
 
             {/* 5. Smart Suggestion */}
-            <div className="bg-gradient-to-r from-purple-950/30 to-pink-950/30 backdrop-blur-xl border border-purple-400/30 rounded-2xl p-3">
+                       <div className="bg-gradient-to-r from-cyan-950/40 to-teal-950/30 backdrop-blur-xl border border-cyan-400/30 rounded-2xl p-3">
               <div className="flex items-center gap-3">
                 <span className="text-xl">{suggestion.emoji}</span>
                 <p className="text-sm text-white/80">{suggestion.text}</p>
@@ -1156,7 +1157,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
             {/* 6. Expandable Details */}
             <button
               onClick={() => setShowDetails(!showDetails)}
-              className="w-full flex items-center justify-between p-4 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl hover:bg-black/40 transition-colors"
+                           className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-xl border border-gray-600/30 rounded-2xl hover:from-gray-700/50 hover:to-gray-800/50 transition-colors"
             >
               <span className="font-medium text-white/80">📋 View Details</span>
               <span className={`transition-transform ${showDetails ? 'rotate-90' : ''}`}>▶</span>
@@ -1164,7 +1165,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
             {showDetails && (
               <div className="space-y-3 mt-3">
                 {challenges.length > 0 && (
-                  <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
+                                    <div className="bg-gradient-to-br from-purple-950/30 to-indigo-950/20 backdrop-blur-xl border border-purple-400/20 rounded-2xl p-4">
                     <h3 className="text-sm font-semibold mb-2 text-white/60">🎯 Challenges</h3>
                     {challenges.map((ch) => (
                       <div key={ch.id} className="mb-2">
@@ -1180,7 +1181,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                   </div>
                 )}
                 {breakdown.length > 0 && (
-                  <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
+                                  <div className="bg-gradient-to-br from-blue-950/30 to-cyan-950/20 backdrop-blur-xl border border-blue-400/20 rounded-2xl p-4">
                     <h3 className="text-sm font-semibold mb-2 text-white/60">📈 Point Sources</h3>
                     {breakdown.slice(0, 5).map((item) => (
                       <div key={item.category} className="flex justify-between text-xs py-1">
@@ -1194,7 +1195,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                     {breakdown.length > 5 && <p className="text-[10px] text-white/40 mt-1">+{breakdown.length - 5} more</p>}
                   </div>
                 )}
-                <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
+                                <div className="bg-gradient-to-br from-pink-950/30 to-rose-950/20 backdrop-blur-xl border border-pink-400/20 rounded-2xl p-4">
                   <div className="flex items-center gap-3">
                     <span className="text-3xl">{persona.emoji}</span>
                     <div>
@@ -1536,6 +1537,47 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                 <p className="text-white/50 text-center py-4">Log at least 3 days for smart insights</p>
               )}
             </div>
+                        {/* Points Reference Table */}
+            <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <h2 className="text-lg font-semibold mb-3 text-white/80">📋 Points Per Hour</h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-white/10">
+                      <th className="text-left py-2 text-white/60">Category</th>
+                      <th className="text-center py-2 text-blue-300">Productivity</th>
+                      <th className="text-center py-2 text-green-300">Happiness</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {categories.map((cat) => (
+                      <tr key={cat} className="border-b border-white/5">
+                        <td className="py-2 flex items-center gap-2">
+                          <span className={`w-2 h-2 rounded-full ${
+                            cat === "Study" ? "bg-blue-400" :
+                            cat === "Work" ? "bg-indigo-400" :
+                            cat === "Gym" ? "bg-orange-400" :
+                            cat === "Sports" ? "bg-red-400" :
+                            cat === "Social" ? "bg-green-400" :
+                            cat === "Rest" ? "bg-yellow-400" :
+                            cat === "Sleep" ? "bg-purple-400" :
+                            cat === "Personal Hobby" ? "bg-pink-400" :
+                            cat === "Gaming" ? "bg-cyan-400" :
+                            cat === "Meals" ? "bg-amber-400" : "bg-gray-400"
+                          }`} />
+                          {cat}
+                        </td>
+                        <td className="text-center text-blue-300">+{productivityMap[cat]}</td>
+                        <td className="text-center text-green-300">+{happinessMap[cat]}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-[10px] text-white/40 mt-3 text-center">
+                Values shown are per hour. Daily modifier may affect final scores.
+              </p>
+            </div>
 
             {/* Mood-Energy Correlation */}
             {pulseEnergy && pulseMood && (
@@ -1758,28 +1800,61 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
             </div>
           </div>
         )}
+                {currentTab === "guide" && (
+          <div className="max-w-2xl mx-auto space-y-4">
+            <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <h2 className="text-xl font-semibold mb-4 text-white/90">📖 Life OS Guide</h2>
+              <p className="text-sm text-white/60 mb-4">Everything you need to know, explained simply.</p>
+              
+              <div className="space-y-3">
+                {[
+                  { title: "🏠 Home Tab", content: "Your dashboard. See daily scores, identity panel, pulse check-in, smart suggestions, and expandable details (challenges, point sources, persona, streaks)." },
+                  { title: "📝 Log Tab", content: "Track activities two ways: Hourly (assign each hour a category) or Activity (bulk log hours). This builds your daily scores." },
+                  { title: "🎯 Goals Tab", content: "Plan your ideal day. Compare projected vs actual scores to see how well you executed." },
+                  { title: "📊 Insights Tab", content: "View planned vs actual, smart correlations (last 7 days), mood-energy impact, daily breakdown, and points reference table." },
+                  { title: "👤 Profile Tab", content: "RPG character stats, badges earned, accountability partner, and data management (export/import/reset)." },
+                  { title: "🎮 RPG System", content: "Every logged hour = 10 XP. 100 XP = 1 Level. Stats (INT, STR, CHA, VIT, SPR) grow based on categories. Purely for role-play and insight." },
+                  { title: "🪙 Tokens", content: "Earn tokens from Study/Work/Gym. Spend on Gaming/Rest. Low tokens reduce happiness gain." },
+                  { title: "🧘 Daily Modifier", content: "Each day has a random modifier (Monk Mode, Social Boost, Recovery Day) that multiplies productivity or happiness." },
+                  { title: "⚡ Pulse", content: "Quick daily check-in: Energy, Mood, Intention. Get witty feedback based on your combination." },
+                  { title: "🏅 Badges & Challenges", content: "Unlock badges for milestones. Weekly challenges appear on Home to guide your focus." },
+                ].map((item, idx) => (
+                  <details key={idx} className="group bg-white/5 rounded-xl border border-white/10">
+                    <summary className="p-4 font-medium cursor-pointer list-none flex items-center justify-between">
+                      <span>{item.title}</span>
+                      <span className="text-white/50 group-open:rotate-90 transition-transform">▶</span>
+                    </summary>
+                    <div className="px-4 pb-4 text-sm text-white/70 border-t border-white/10 pt-3">
+                      {item.content}
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
-       {/* Floating Coach Button with Label */}
-<div className="fixed bottom-6 right-6 z-40 flex flex-col items-center gap-1">
-  <button
-    onClick={() => {
-      if (typeof window !== "undefined" && sessionStorage.getItem("onboarding_logging") === "true") {
-        sessionStorage.removeItem("onboarding_logging");
-        setShowOnboarding(true);
-        setOnboardingStep(3);
-      } else {
-        setShowCoachModal(true);
-      }
-    }}
-    className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg border border-white/30 flex items-center justify-center text-2xl animate-bounce-slow hover:scale-110 transition-transform"
-    style={{ touchAction: "manipulation" }}
-  >
-    ✨
-  </button>
-  <span className="text-xs bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full text-white/80 border border-white/20">
-    Coach
-  </span>
-</div>
+              {/* Floating Coach Button with Label */}
+        <div className="fixed bottom-6 right-6 z-40 flex flex-col items-center gap-1">
+          <button
+            onClick={() => {
+              if (typeof window !== "undefined" && sessionStorage.getItem("onboarding_logging") === "true") {
+                sessionStorage.removeItem("onboarding_logging");
+                setShowOnboarding(true);
+                setOnboardingStep(3);
+              } else {
+                setCurrentTab("guide");
+              }
+            }}
+            className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg border border-white/30 flex items-center justify-center text-2xl animate-bounce-slow hover:scale-110 transition-transform"
+            style={{ touchAction: "manipulation" }}
+          >
+            ✨
+          </button>
+          <span className="text-xs bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full text-white/80 border border-white/20">
+            Guide
+          </span>
+        </div>
             
 {/* Coach Guide Modal - Enhanced */}
 {showCoachModal && (
