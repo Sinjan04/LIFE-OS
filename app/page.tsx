@@ -1016,7 +1016,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
         </div>
 
         {/* Tab Content */}
-        {currentTab === "home" && (
+                {currentTab === "home" && (
           <div className="max-w-2xl mx-auto space-y-4">
             {/* 1. Identity Panel */}
             <div className="bg-gradient-to-r from-blue-950/40 to-purple-950/40 backdrop-blur-xl border border-white/20 rounded-2xl p-4">
@@ -1051,26 +1051,33 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
               </div>
             </div>
 
-            {/* 2. Today's Scores Grid (Five Metrics) */}
+            {/* 2. Today's Scores Grid */}
             <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-3xl p-4">
               <h2 className="text-sm font-semibold mb-3 text-white/60 uppercase tracking-wider flex items-center gap-2">
                 <span>📊 Today's Scores</span>
               </h2>
               <div className="grid grid-cols-5 gap-2">
-                {[
-                  { label: "Prod", value: actualScores.productivity, color: "blue" },
-                  { label: "Happy", value: actualScores.happiness, color: "green" },
-                  { label: "Balance", value: balanceScore, color: "purple" },
-                  { label: "Focus", value: focusScore, color: "amber" },
-                  { label: "Recovery", value: recoveryScore, color: "teal" },
-                ].map((item) => (
-                  <div key={item.label} className="text-center">
-                    <p className="text-[10px] text-white/50">{item.label}</p>
-                    <p className={`text-xl font-bold text-${item.color}-300`}>{item.value}</p>
-                  </div>
-                ))}
+                <div className="text-center">
+                  <p className="text-[10px] text-white/50">Prod</p>
+                  <p className="text-xl font-bold text-blue-300">{actualScores.productivity}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] text-white/50">Happy</p>
+                  <p className="text-xl font-bold text-green-300">{actualScores.happiness}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] text-white/50">Balance</p>
+                  <p className="text-xl font-bold text-purple-300">{balanceScore}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] text-white/50">Focus</p>
+                  <p className="text-xl font-bold text-amber-300">{focusScore}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] text-white/50">Recovery</p>
+                  <p className="text-xl font-bold text-teal-300">{recoveryScore}</p>
+                </div>
               </div>
-              {/* Mini progress bars */}
               <div className="mt-3 space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] w-12 text-white/50">Prod</span>
@@ -1087,7 +1094,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
               </div>
             </div>
 
-            {/* 3. Daily Modifier (if exists) */}
+            {/* 3. Daily Modifier */}
             {dailyModifier.type && (
               <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-sm border border-purple-400/40 rounded-full px-4 py-2 text-center text-sm">
                 <span className="mr-2">{dailyModifier.emoji}</span>
@@ -1097,7 +1104,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
               </div>
             )}
 
-            {/* 4. Pulse (compact version) */}
+            {/* 4. Pulse (compact) */}
             <div className="bg-gradient-to-br from-amber-950/20 to-orange-950/20 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium text-white/70">⚡ Pulse</h3>
@@ -1129,9 +1136,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
               ) : (
                 <button
                   onClick={() => {
-                    // Scroll to pulse section or expand inline
-                    const pulseSection = document.getElementById('pulse-section');
-                    if (pulseSection) pulseSection.scrollIntoView({ behavior: 'smooth' });
+                    // Expand pulse form (we'll handle this later)
                   }}
                   className="w-full text-left text-sm text-white/50"
                 >
@@ -1148,7 +1153,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
               </div>
             </div>
 
-            {/* 6. Expandable Details Section */}
+            {/* 6. Expandable Details */}
             <button
               onClick={() => setShowDetails(!showDetails)}
               className="w-full flex items-center justify-between p-4 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl hover:bg-black/40 transition-colors"
@@ -1158,7 +1163,6 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
             </button>
             {showDetails && (
               <div className="space-y-3 mt-3">
-                {/* Weekly Challenges */}
                 {challenges.length > 0 && (
                   <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
                     <h3 className="text-sm font-semibold mb-2 text-white/60">🎯 Challenges</h3>
@@ -1175,8 +1179,6 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                     ))}
                   </div>
                 )}
-                
-                {/* Point Allocation */}
                 {breakdown.length > 0 && (
                   <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
                     <h3 className="text-sm font-semibold mb-2 text-white/60">📈 Point Sources</h3>
@@ -1192,8 +1194,6 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                     {breakdown.length > 5 && <p className="text-[10px] text-white/40 mt-1">+{breakdown.length - 5} more</p>}
                   </div>
                 )}
-
-                {/* Persona */}
                 <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
                   <div className="flex items-center gap-3">
                     <span className="text-3xl">{persona.emoji}</span>
@@ -1203,8 +1203,6 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                     </div>
                   </div>
                 </div>
-
-                {/* Streaks */}
                 <div className="flex gap-4 justify-center py-2">
                   <div className="text-center">
                     <span className="text-xl">🔥</span>
