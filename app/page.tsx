@@ -1070,125 +1070,127 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                 {pulseCompleted && <span className="text-green-400 text-sm">✓</span>}
               </h2>
               {!pulseCompleted ? (
-<div className="space-y-4">
-  <div>
-    <p className="text-sm text-white/60 mb-2">Energy</p>
-    <div className="grid grid-cols-4 gap-2">
-      {[
-        { value: "low", label: "🥱 Low" },
-        { value: "mid", label: "😐 Mid" },
-        { value: "high", label: "⚡ High" },
-        { value: "drained", label: "🪫 Drained" },
-      ].map(({ value, label }) => (
-        <button
-          key={value}
-          onClick={() => setPulseEnergy(value as any)}
-          className={`py-2.5 rounded-xl border text-sm transition-all ${
-            pulseEnergy === value
-              ? "bg-gradient-to-r from-blue-500/40 to-cyan-500/40 border-white/40"
-              : "bg-white/5 border-white/15"
-          }`}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
-  </div>
-  <div>
-    <p className="text-sm text-white/60 mb-2">Mood</p>
-    <div className="grid grid-cols-3 gap-2">
-      {["😊", "😐", "😤", "😢", "🤩", "😴"].map((mood) => (
-        <button
-          key={mood}
-          onClick={() => setPulseMood(mood as any)}
-          className={`py-2.5 rounded-xl border text-xl ${
-            pulseMood === mood
-              ? "bg-gradient-to-r from-green-500/40 to-lime-500/40 border-white/40"
-              : "bg-white/5 border-white/15"
-          }`}
-        >
-          {mood}
-        </button>
-      ))}
-    </div>
-  </div>
-  <div>
-    <p className="text-sm text-white/60 mb-2">Intention</p>
-    <div className="grid grid-cols-3 gap-2">
-      {[
-        { value: "Work", emoji: "💼" },
-        { value: "Rest", emoji: "🛋️" },
-        { value: "Balance", emoji: "⚖️" },
-        { value: "Survive", emoji: "🧟" },
-        { value: "Create", emoji: "🎨" },
-      ].map(({ value, emoji }) => (
-        <button
-          key={value}
-          onClick={() => setPulseIntention(value as any)}
-          className={`py-2.5 rounded-xl border text-sm ${
-            pulseIntention === value
-              ? "bg-gradient-to-r from-purple-500/40 to-pink-500/40 border-white/40"
-              : "bg-white/5 border-white/15"
-          }`}
-        >
-          {emoji} {value}
-        </button>
-      ))}
-    </div>
-  </div>
-  <button
-    onClick={handlePulseSubmit}
-    disabled={!pulseEnergy || !pulseMood || !pulseIntention}
-    className="w-full bg-gradient-to-r from-blue-500/30 to-cyan-500/30 border border-white/30 rounded-xl py-3 font-medium disabled:opacity-30"
-  >
-    Save Pulse
-  </button>
-</div>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-white/60 mb-2">Energy</p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {[
+                        { value: "low", label: "🥱 Low" },
+                        { value: "mid", label: "😐 Mid" },
+                        { value: "high", label: "⚡ High" },
+                        { value: "drained", label: "🪫 Drained" },
+                      ].map(({ value, label }) => (
+                        <button
+                          key={value}
+                          onClick={() => setPulseEnergy(value as any)}
+                          className={`py-2.5 rounded-xl border text-sm transition-all ${
+                            pulseEnergy === value
+                              ? "bg-gradient-to-r from-blue-500/40 to-cyan-500/40 border-white/40"
+                              : "bg-white/5 border-white/15"
+                          }`}
+                          style={{ touchAction: "manipulation" }}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm text-white/60 mb-2">Mood</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {["😊", "😐", "😤", "😢", "🤩", "😴"].map((mood) => (
+                        <button
+                          key={mood}
+                          onClick={() => setPulseMood(mood as any)}
+                          className={`py-2.5 rounded-xl border text-xl ${
+                            pulseMood === mood
+                              ? "bg-gradient-to-r from-green-500/40 to-lime-500/40 border-white/40"
+                              : "bg-white/5 border-white/15"
+                          }`}
+                          style={{ touchAction: "manipulation" }}
+                        >
+                          {mood}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm text-white/60 mb-2">Intention</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { value: "Work", emoji: "💼" },
+                        { value: "Rest", emoji: "🛋️" },
+                        { value: "Balance", emoji: "⚖️" },
+                        { value: "Survive", emoji: "🧟" },
+                        { value: "Create", emoji: "🎨" },
+                      ].map(({ value, emoji }) => (
+                        <button
+                          key={value}
+                          onClick={() => setPulseIntention(value as any)}
+                          className={`py-2.5 rounded-xl border text-sm ${
+                            pulseIntention === value
+                              ? "bg-gradient-to-r from-purple-500/40 to-pink-500/40 border-white/40"
+                              : "bg-white/5 border-white/15"
+                          }`}
+                          style={{ touchAction: "manipulation" }}
+                        >
+                          {emoji} {value}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <button
+                    onClick={handlePulseSubmit}
+                    disabled={!pulseEnergy || !pulseMood || !pulseIntention}
+                    className="w-full bg-gradient-to-r from-blue-500/30 to-cyan-500/30 border border-white/30 rounded-xl py-3 font-medium disabled:opacity-30 hover:scale-[1.01] transition-all"
+                    style={{ touchAction: "manipulation" }}
+                  >
+                    Save Pulse
+                  </button>
+                </div>
               ) : (
-                {pulseCompleted ? (
-  <div className="py-2">
-    <div className="flex justify-around mb-4">
-      <div className="text-center">
-        <span className="text-3xl">
-          {pulseEnergy === "low" ? "🥱" : pulseEnergy === "mid" ? "😐" : pulseEnergy === "high" ? "⚡" : "🪫"}
-        </span>
-        <p className="text-xs text-white/60 mt-1 capitalize">{pulseEnergy}</p>
-      </div>
-      <div className="text-center">
-        <span className="text-3xl">{pulseMood}</span>
-        <p className="text-xs text-white/60 mt-1">Mood</p>
-      </div>
-      <div className="text-center">
-        <span className="text-3xl">
-          {pulseIntention === "Work" ? "💼" : pulseIntention === "Rest" ? "🛋️" : pulseIntention === "Balance" ? "⚖️" : pulseIntention === "Survive" ? "🧟" : "🎨"}
-        </span>
-        <p className="text-xs text-white/60 mt-1">{pulseIntention}</p>
-      </div>
-    </div>
-    {/* Witty Feedback */}
-    <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-400/30 rounded-xl p-3 text-center">
-      <p className="text-lg mb-1">{getPulseFeedback(pulseEnergy, pulseMood, pulseIntention).emoji}</p>
-      <p className="text-sm text-white/80 italic">
-        "{getPulseFeedback(pulseEnergy, pulseMood, pulseIntention).text}"
-      </p>
-    </div>
-    <button
-      onClick={() => {
-        setPulseEnergy(null);
-        setPulseMood(null);
-        setPulseIntention(null);
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("lifeos_pulse");
-        }
-      }}
-      className="w-full mt-3 text-xs text-white/50 hover:text-white/80 transition-colors"
-    >
-      Redo Pulse
-    </button>
-  </div>
-) : (
-  // ... the pulse input form remains unchanged (but we should also update its options)
-)}
+                <div className="py-2">
+                  <div className="flex justify-around mb-4">
+                    <div className="text-center">
+                      <span className="text-3xl">
+                        {pulseEnergy === "low" ? "🥱" : pulseEnergy === "mid" ? "😐" : pulseEnergy === "high" ? "⚡" : "🪫"}
+                      </span>
+                      <p className="text-xs text-white/60 mt-1 capitalize">{pulseEnergy}</p>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-3xl">{pulseMood}</span>
+                      <p className="text-xs text-white/60 mt-1">Mood</p>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-3xl">
+                        {pulseIntention === "Work" ? "💼" : pulseIntention === "Rest" ? "🛋️" : pulseIntention === "Balance" ? "⚖️" : pulseIntention === "Survive" ? "🧟" : "🎨"}
+                      </span>
+                      <p className="text-xs text-white/60 mt-1">{pulseIntention}</p>
+                    </div>
+                  </div>
+                  {/* Witty Feedback */}
+                  <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-400/30 rounded-xl p-3 text-center">
+                    <p className="text-lg mb-1">{getPulseFeedback(pulseEnergy, pulseMood, pulseIntention).emoji}</p>
+                    <p className="text-sm text-white/80 italic">
+                      "{getPulseFeedback(pulseEnergy, pulseMood, pulseIntention).text}"
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setPulseEnergy(null);
+                      setPulseMood(null);
+                      setPulseIntention(null);
+                      if (typeof window !== "undefined") {
+                        localStorage.removeItem("lifeos_pulse");
+                      }
+                    }}
+                    className="w-full mt-3 text-xs text-white/50 hover:text-white/80 transition-colors"
+                  >
+                    Redo Pulse
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Five Metrics Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
