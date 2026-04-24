@@ -76,17 +76,17 @@ const statMap: Record<Category, "INT" | "STR" | "CHA" | "VIT" | "SPR" | null> = 
   Other: null,
 };
 const blockStyles: Record<Category, string> = {
-  Study: "bg-gradient-to-r from-blue-900/30 to-blue-800/30 border-blue-400/40",
-  Work: "bg-gradient-to-r from-indigo-900/30 to-indigo-800/30 border-indigo-400/40",
-  Gym: "bg-gradient-to-r from-orange-900/30 to-red-800/30 border-orange-400/40",
-  Sports: "bg-gradient-to-r from-red-900/30 to-orange-800/30 border-red-400/40",
-  Social: "bg-gradient-to-r from-green-900/30 to-lime-800/30 border-green-400/40",
-  Rest: "bg-gradient-to-r from-yellow-900/30 to-amber-800/30 border-yellow-400/40",
-  Sleep: "bg-gradient-to-r from-purple-900/30 to-indigo-800/30 border-purple-400/40",
-  "Personal Hobby": "bg-gradient-to-r from-pink-900/30 to-rose-800/30 border-pink-400/40",
-  Gaming: "bg-gradient-to-r from-cyan-900/30 to-teal-800/30 border-cyan-400/40",
-  Meals: "bg-gradient-to-r from-amber-900/30 to-orange-800/30 border-amber-400/40",
-  Other: "bg-gradient-to-r from-gray-800/30 to-gray-700/30 border-gray-400/40",
+  Study: "bg-blue-900/20 border-blue-400/40",
+  Work: "bg-indigo-900/20 border-indigo-400/40",
+  Gym: "bg-orange-900/20 border-orange-400/40",
+  Sports: "bg-red-900/20 border-red-400/40",
+  Social: "bg-green-900/20 border-green-400/40",
+  Rest: "bg-yellow-900/20 border-yellow-400/40",
+  Sleep: "bg-purple-900/20 border-purple-400/40",
+  "Personal Hobby": "bg-pink-900/20 border-pink-400/40",
+  Gaming: "bg-cyan-900/20 border-cyan-400/40",
+  Meals: "bg-amber-900/20 border-amber-400/40",
+  Other: "bg-gray-800/20 border-gray-400/40",
 };
 
 const defaultBlockStyle = "bg-white/5 border-white/10";
@@ -386,10 +386,9 @@ export default function Home() {
   const [showScoreModal, setShowScoreModal] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentTab, setCurrentTab] = useState<TabId>("home");
- // Replace the old pulse state lines with these expanded versions
-const [pulseEnergy, setPulseEnergy] = useState<"low" | "mid" | "high" | "drained" | null>(null);
-const [pulseMood, setPulseMood] = useState<"😊" | "😐" | "😤" | "😢" | "🤩" | "😴" | null>(null);
-const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance" | "Survive" | "Create" | null>(null);
+  const [pulseEnergy, setPulseEnergy] = useState<"low" | "mid" | "high" | "drained" | null>(null);
+  const [pulseMood, setPulseMood] = useState<"😊" | "😐" | "😤" | "😢" | "🤩" | "😴" | null>(null);
+  const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance" | "Survive" | "Create" | null>(null);
   const [history, setHistory] = useState<Array<{ date: string; productivity: number; happiness: number; reflection?: string }>>([]);
   const [unlockedBadges, setUnlockedBadges] = useState<string[]>([]);
   const [newBadge, setNewBadge] = useState<string | null>(null);
@@ -409,8 +408,8 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
   const [tokenBalance, setTokenBalance] = useState(0);
   const [prevLevel, setPrevLevel] = useState(0);
   const [showLevelUp, setShowLevelUp] = useState(false);
-    const [showDetails, setShowDetails] = useState(false);
-    const [showRpgInfo, setShowRpgInfo] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
+  const [showRpgInfo, setShowRpgInfo] = useState(false);
   
   const dailyModifier = getDailyModifier();
   const level = Math.floor(totalXP / 100);
@@ -923,36 +922,20 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
     SPR: hoursMap["Personal Hobby"] || 0,
   };
   const maxStat = Math.max(...Object.values(rpgStats), 1);
-
-  return (
+    return (
     <>
-      {/* Enhanced Abstract Background with Visuals */}
-      <div className="fixed inset-0 -z-10 bg-black overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_20%_30%,#0a1a2f,transparent)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_80%_70%,#0a2a1a,transparent)]" />
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-lime-500/15 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-[100px] animate-float-slow" />
-        <div className="absolute bottom-1/3 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-[80px] animate-float-slower" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-white/5 rounded-full animate-spin-slow" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] border border-white/5 rounded-full animate-spin-slower" />
-        <div className="absolute top-20 right-20 w-1 h-1 bg-white/20 rounded-full animate-ping" />
-        <div className="absolute bottom-40 left-10 w-2 h-2 bg-blue-400/30 rounded-full animate-pulse" />
-        <div className="absolute top-1/4 left-1/3 w-1.5 h-1.5 bg-green-400/20 rounded-full animate-bounce" />
-        <div className="absolute inset-0 opacity-[0.03]">
-          <div className="h-full w-full" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
-        </div>
-      </div>
+      {/* Solid black background — premium minimal like How We Feel */}
+      <div className="fixed inset-0 -z-10 bg-black" />
 
-      <div className="relative text-white min-h-screen px-4 py-6 sm:px-6 sm:py-8 font-sans antialiased pb-8">
+      <div className="relative text-white min-h-screen px-5 py-8 sm:px-6 sm:py-10 font-sans antialiased max-w-2xl mx-auto">
         {/* Level Up Celebration */}
         {showLevelUp && (
           <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 animate-bounce-in">
-            <div className="bg-gradient-to-r from-purple-500/90 to-pink-500/90 backdrop-blur-xl border border-purple-300 rounded-2xl px-6 py-4 shadow-2xl flex items-center gap-3">
+            <div className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-3">
               <span className="text-4xl">⬆️</span>
               <div>
-                <p className="font-bold text-white">Level Up!</p>
-                <p className="text-sm text-white/90">You are now Level {level}</p>
+                <p className="font-medium text-white">Level Up!</p>
+                <p className="text-sm text-white/60">You are now Level {level}</p>
               </div>
             </div>
           </div>
@@ -960,11 +943,11 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
         
         {showCelebration && currentBadge && (
           <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 animate-bounce-in">
-            <div className="bg-gradient-to-r from-yellow-500/90 to-amber-500/90 backdrop-blur-xl border border-yellow-300 rounded-2xl px-6 py-4 shadow-2xl flex items-center gap-3">
+            <div className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-3">
               <span className="text-4xl">{currentBadge.emoji}</span>
               <div>
-                <p className="font-bold text-black">Badge Unlocked!</p>
-                <p className="text-sm text-black/80">{currentBadge.name}</p>
+                <p className="font-medium text-white">Badge Unlocked!</p>
+                <p className="text-sm text-white/60">{currentBadge.name}</p>
               </div>
             </div>
           </div>
@@ -972,41 +955,36 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
 
         {/* Daily Modifier Banner */}
         {dailyModifier.type && (
-          <div className="max-w-2xl mx-auto mb-3">
-            <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-sm border border-purple-400/40 rounded-full px-4 py-2 text-center text-sm">
-              <span className="mr-2">{dailyModifier.emoji}</span>
+          <div className="mb-6 text-center">
+            <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full px-5 py-2 text-sm">
+              <span>{dailyModifier.emoji}</span>
               <span className="font-medium">{dailyModifier.name}</span>
-              <span className="mx-2 text-white/50">|</span>
-              <span>Prod {dailyModifier.prodMultiplier}x · Happy {dailyModifier.happyMultiplier}x</span>
+              <span className="text-white/30">·</span>
+              <span className="text-white/60">Prod {dailyModifier.prodMultiplier}x · Happy {dailyModifier.happyMultiplier}x</span>
             </div>
           </div>
         )}
 
-        {/* Hero Section with Tagline */}
-        <div className="mb-6 text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight bg-gradient-to-r from-blue-400 via-green-400 to-lime-300 text-transparent bg-clip-text drop-shadow-[0_0_25px_rgba(34,197,94,0.4)] animate-fade-in-up">
-            LIFE OS
-          </h1>
-          <p className="text-gray-300/80 mt-3 text-sm sm:text-base md:text-lg font-light tracking-wide max-w-2xl mx-auto leading-relaxed">
-            Live every moment, track every activity, take full control of your life.<br />
-            Build streaks, take on challenges, earn badges.<br />
-            Just show up everyday and live your life like a simulation.
+        {/* Minimal Hero */}
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl sm:text-5xl font-light tracking-tight text-white/90">Life OS</h1>
+          <p className="text-sm text-white/40 mt-2 max-w-md mx-auto leading-relaxed">
+            your mindful daily tracker
           </p>
         </div>
 
-        {/* Top Navigation Bar with Labels */}
-        <div className="flex justify-center mb-6">
-          <div className="flex gap-0.5 bg-white/5 backdrop-blur-sm border border-white/15 rounded-full p-1">
+        {/* Navigation Tabs */}
+        <div className="flex justify-center mb-8">
+          <div className="flex gap-0.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full p-1">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setCurrentTab(tab.id)}
-                className={`flex flex-col items-center px-4 py-2 rounded-full transition-all duration-200 hover:scale-105 ${
+                className={`flex flex-col items-center px-4 py-2 rounded-full transition-all duration-200 ${
                   currentTab === tab.id
-                    ? "bg-white/20 text-white"
-                    : "text-white/50 hover:text-white/80 hover:bg-white/10"
+                    ? "bg-white/15 text-white"
+                    : "text-white/50 hover:text-white/80"
                 }`}
-                title={tab.label}
                 style={{ touchAction: "manipulation" }}
               >
                 <span className="text-lg">{tab.emoji}</span>
@@ -1017,41 +995,36 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
         </div>
 
         {/* Tab Content */}
-                {currentTab === "home" && (
-          <div className="max-w-2xl mx-auto space-y-4">
-            {/* 1. Identity Panel */}
-            <div className="bg-gradient-to-r from-blue-950/40 to-purple-950/40 backdrop-blur-xl border border-white/20 rounded-2xl p-4">
+        {currentTab === "home" && (
+          <div className="space-y-5">
+            {/* Identity Panel — softer, minimal */}
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-3xl">👤</span>
+                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-xl">
+                    {userName?.charAt(0)?.toUpperCase() || "?"}
+                  </div>
                   <div>
-                    <p className="font-semibold text-lg">{userName || "Traveler"}</p>
-                    <div className="flex items-center gap-2 text-sm">
+                    <p className="font-medium text-white/90">{userName || "Traveler"}</p>
+                    <div className="flex items-center gap-2 text-sm text-white/50">
                       <span>Lv.{level}</span>
-                      <span className="text-white/40">•</span>
+                      <span>·</span>
                       <span>{rank.emoji} {rank.title}</span>
-                       <button
-                        onClick={() => setShowRpgInfo(true)}
-                        className="ml-1 w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-xs hover:bg-white/20 transition-colors"
-                        style={{ touchAction: "manipulation" }}
-                      >
-                        ?
-                      </button>
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 text-white/80">
                     <span className="text-yellow-400">✨</span>
-                    <span className="font-semibold">{totalXP} XP</span>
+                    <span className="font-medium">{totalXP} XP</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-1.5 text-sm text-white/60">
                     <span className="text-amber-400">🪙</span>
                     <span>{tokenBalance}</span>
                   </div>
                 </div>
               </div>
-              <div className="mt-2 w-full h-1.5 bg-white/10 rounded-full">
+              <div className="mt-3 w-full h-1 bg-white/10 rounded-full">
                 <div 
                   className="h-full bg-gradient-to-r from-blue-400 to-purple-400 rounded-full transition-all"
                   style={{ width: `${(totalXP % 100)}%` }}
@@ -1059,42 +1032,40 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
               </div>
             </div>
 
-            {/* 2. Today's Scores Grid */}
-            <div className="bg-gradient-to-br from-slate-900/60 to-black/40 backdrop-blur-xl border border-slate-700/50 rounded-3xl p-4">
-              <h2 className="text-sm font-semibold mb-3 text-white/60 uppercase tracking-wider flex items-center gap-2">
-                <span>📊 Today's Scores</span>
-              </h2>
-              <div className="grid grid-cols-5 gap-2">
-                <div className="text-center">
-                  <p className="text-[10px] text-white/50">Prod</p>
-                  <p className="text-xl font-bold text-blue-300">{actualScores.productivity}</p>
+            {/* Today's Scores — clean cards */}
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <h2 className="text-xs font-medium uppercase tracking-widest text-white/50 mb-4">Today&apos;s Scores</h2>
+              <div className="grid grid-cols-5 gap-3 text-center">
+                <div>
+                  <p className="text-xs text-white/40 mb-1">Prod</p>
+                  <p className="text-2xl font-light text-blue-300">{actualScores.productivity}</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-[10px] text-white/50">Happy</p>
-                  <p className="text-xl font-bold text-green-300">{actualScores.happiness}</p>
+                <div>
+                  <p className="text-xs text-white/40 mb-1">Happy</p>
+                  <p className="text-2xl font-light text-green-300">{actualScores.happiness}</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-[10px] text-white/50">Balance</p>
-                  <p className="text-xl font-bold text-purple-300">{balanceScore}</p>
+                <div>
+                  <p className="text-xs text-white/40 mb-1">Balance</p>
+                  <p className="text-2xl font-light text-purple-300">{balanceScore}</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-[10px] text-white/50">Focus</p>
-                  <p className="text-xl font-bold text-amber-300">{focusScore}</p>
+                <div>
+                  <p className="text-xs text-white/40 mb-1">Focus</p>
+                  <p className="text-2xl font-light text-amber-300">{focusScore}</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-[10px] text-white/50">Recovery</p>
-                  <p className="text-xl font-bold text-teal-300">{recoveryScore}</p>
+                <div>
+                  <p className="text-xs text-white/40 mb-1">Recovery</p>
+                  <p className="text-2xl font-light text-teal-300">{recoveryScore}</p>
                 </div>
               </div>
-              <div className="mt-3 space-y-1">
+              <div className="mt-4 space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] w-12 text-white/50">Prod</span>
+                  <span className="text-[10px] w-10 text-white/40">Prod</span>
                   <div className="flex-1 h-1.5 bg-white/10 rounded-full">
                     <div className="h-full bg-blue-400 rounded-full" style={{ width: `${actualScores.productivity}%` }} />
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] w-12 text-white/50">Happy</span>
+                  <span className="text-[10px] w-10 text-white/40">Happy</span>
                   <div className="flex-1 h-1.5 bg-white/10 rounded-full">
                     <div className="h-full bg-green-400 rounded-full" style={{ width: `${actualScores.happiness}%` }} />
                   </div>
@@ -1102,22 +1073,12 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
               </div>
             </div>
 
-            {/* 3. Daily Modifier */}
-            {dailyModifier.type && (
-                          <div className="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 backdrop-blur-sm border border-indigo-400/40 rounded-full px-4 py-2 text-center text-sm">
-                <span className="mr-2">{dailyModifier.emoji}</span>
-                <span className="font-medium">{dailyModifier.name}</span>
-                <span className="mx-2 text-white/50">|</span>
-                <span>Prod {dailyModifier.prodMultiplier}x · Happy {dailyModifier.happyMultiplier}x</span>
-              </div>
-            )}
-
-            {/* 4. Pulse */}
-            <div className="bg-gradient-to-br from-amber-950/40 to-orange-950/30 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-medium text-white/70 flex items-center gap-2">
-                  <span>⚡ Today's Pulse</span>
-                  {pulseCompleted && <span className="text-green-400 text-xs">✓</span>}
+            {/* Pulse Check-in */}
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xs font-medium uppercase tracking-widest text-white/50 flex items-center gap-2">
+                  <span>⚡ Pulse</span>
+                  {pulseCompleted && <span className="text-green-400">✓</span>}
                 </h3>
                 {pulseCompleted && (
                   <button
@@ -1129,14 +1090,14 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                     }}
                     className="text-xs text-white/50 hover:text-white bg-white/10 px-3 py-1 rounded-full transition-colors"
                   >
-                    Redo Pulse
+                    Redo
                   </button>
                 )}
               </div>
               {!pulseCompleted ? (
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <div>
-                    <p className="text-xs text-white/60 mb-2">Energy</p>
+                    <p className="text-xs text-white/40 mb-2">Energy</p>
                     <div className="grid grid-cols-4 gap-2">
                       {[
                         { value: "low", label: "🥱 Low" },
@@ -1149,8 +1110,8 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                           onClick={() => setPulseEnergy(value as any)}
                           className={`py-2.5 rounded-xl border text-sm transition-all ${
                             pulseEnergy === value
-                              ? "bg-gradient-to-r from-blue-500/40 to-cyan-500/40 border-white/40"
-                              : "bg-white/5 border-white/15"
+                              ? "bg-white/10 border-white/30"
+                              : "bg-white/5 border-white/10"
                           }`}
                           style={{ touchAction: "manipulation" }}
                         >
@@ -1160,7 +1121,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                     </div>
                   </div>
                   <div>
-                    <p className="text-xs text-white/60 mb-2">Mood</p>
+                    <p className="text-xs text-white/40 mb-2">Mood</p>
                     <div className="grid grid-cols-3 gap-2">
                       {["😊", "😐", "😤", "😢", "🤩", "😴"].map((mood) => (
                         <button
@@ -1168,8 +1129,8 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                           onClick={() => setPulseMood(mood as any)}
                           className={`py-2.5 rounded-xl border text-xl ${
                             pulseMood === mood
-                              ? "bg-gradient-to-r from-green-500/40 to-lime-500/40 border-white/40"
-                              : "bg-white/5 border-white/15"
+                              ? "bg-white/10 border-white/30"
+                              : "bg-white/5 border-white/10"
                           }`}
                           style={{ touchAction: "manipulation" }}
                         >
@@ -1179,7 +1140,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                     </div>
                   </div>
                   <div>
-                    <p className="text-xs text-white/60 mb-2">Intention</p>
+                    <p className="text-xs text-white/40 mb-2">Intention</p>
                     <div className="grid grid-cols-3 gap-2">
                       {[
                         { value: "Work", emoji: "💼" },
@@ -1193,8 +1154,8 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                           onClick={() => setPulseIntention(value as any)}
                           className={`py-2.5 rounded-xl border text-sm ${
                             pulseIntention === value
-                              ? "bg-gradient-to-r from-purple-500/40 to-pink-500/40 border-white/40"
-                              : "bg-white/5 border-white/15"
+                              ? "bg-white/10 border-white/30"
+                              : "bg-white/5 border-white/10"
                           }`}
                           style={{ touchAction: "manipulation" }}
                         >
@@ -1206,7 +1167,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                   <button
                     onClick={handlePulseSubmit}
                     disabled={!pulseEnergy || !pulseMood || !pulseIntention}
-                    className="w-full bg-gradient-to-r from-blue-500/30 to-cyan-500/30 border border-white/30 rounded-xl py-3 font-medium disabled:opacity-30 hover:scale-[1.01] transition-all"
+                    className="w-full bg-white/10 border border-white/10 rounded-xl py-3 text-sm font-medium disabled:opacity-30 hover:bg-white/15 transition-all"
                     style={{ touchAction: "manipulation" }}
                   >
                     Save Pulse
@@ -1219,50 +1180,48 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                       <span className="text-3xl">
                         {pulseEnergy === "low" ? "🥱" : pulseEnergy === "mid" ? "😐" : pulseEnergy === "high" ? "⚡" : "🪫"}
                       </span>
-                      <p className="text-xs text-white/60 mt-1 capitalize">{pulseEnergy}</p>
+                      <p className="text-xs text-white/40 mt-1 capitalize">{pulseEnergy}</p>
                     </div>
                     <div className="text-center">
                       <span className="text-3xl">{pulseMood}</span>
-                      <p className="text-xs text-white/60 mt-1">Mood</p>
+                      <p className="text-xs text-white/40 mt-1">Mood</p>
                     </div>
                     <div className="text-center">
                       <span className="text-3xl">
                         {pulseIntention === "Work" ? "💼" : pulseIntention === "Rest" ? "🛋️" : pulseIntention === "Balance" ? "⚖️" : pulseIntention === "Survive" ? "🧟" : "🎨"}
                       </span>
-                      <p className="text-xs text-white/60 mt-1">{pulseIntention}</p>
+                      <p className="text-xs text-white/40 mt-1">{pulseIntention}</p>
                     </div>
                   </div>
-                  {/* Witty Feedback */}
-                  <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-400/30 rounded-xl p-3 text-center">
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
                     <p className="text-lg mb-1">{getPulseFeedback(pulseEnergy, pulseMood, pulseIntention).emoji}</p>
-                    <p className="text-sm text-white/80 italic">
-                      "{getPulseFeedback(pulseEnergy, pulseMood, pulseIntention).text}"
+                    <p className="text-sm text-white/70 italic">
+                      &ldquo;{getPulseFeedback(pulseEnergy, pulseMood, pulseIntention).text}&rdquo;
                     </p>
                   </div>
                 </div>
               )}
             </div>
-            {/* 5. Smart Suggestion */}
-                       <div className="bg-gradient-to-r from-cyan-950/40 to-teal-950/30 backdrop-blur-xl border border-cyan-400/30 rounded-2xl p-3">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">{suggestion.emoji}</span>
-                <p className="text-sm text-white/80">{suggestion.text}</p>
-              </div>
+
+            {/* Smart Suggestion */}
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-4 flex items-center gap-3">
+              <span className="text-xl">{suggestion.emoji}</span>
+              <p className="text-sm text-white/70">{suggestion.text}</p>
             </div>
 
-            {/* 6. Expandable Details */}
+            {/* Expandable Details */}
             <button
               onClick={() => setShowDetails(!showDetails)}
-                           className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-xl border border-gray-600/30 rounded-2xl hover:from-gray-700/50 hover:to-gray-800/50 transition-colors"
+              className="w-full flex items-center justify-between p-4 bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl hover:bg-white/5 transition-colors"
             >
-              <span className="font-medium text-white/80">📋 View Details</span>
+              <span className="font-medium text-white/70">View Details</span>
               <span className={`transition-transform ${showDetails ? 'rotate-90' : ''}`}>▶</span>
             </button>
             {showDetails && (
-              <div className="space-y-3 mt-3">
+              <div className="space-y-4">
                 {challenges.length > 0 && (
-                                    <div className="bg-gradient-to-br from-purple-950/30 to-indigo-950/20 backdrop-blur-xl border border-purple-400/20 rounded-2xl p-4">
-                    <h3 className="text-sm font-semibold mb-2 text-white/60">🎯 Challenges</h3>
+                  <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+                    <h3 className="text-xs font-medium uppercase tracking-widest text-white/50 mb-3">Challenges</h3>
                     {challenges.map((ch) => (
                       <div key={ch.id} className="mb-2">
                         <div className="flex justify-between text-xs mb-1">
@@ -1277,10 +1236,10 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                   </div>
                 )}
                 {breakdown.length > 0 && (
-                                  <div className="bg-gradient-to-br from-blue-950/30 to-cyan-950/20 backdrop-blur-xl border border-blue-400/20 rounded-2xl p-4">
-                    <h3 className="text-sm font-semibold mb-2 text-white/60">📈 Point Sources</h3>
+                  <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+                    <h3 className="text-xs font-medium uppercase tracking-widest text-white/50 mb-3">Point Sources</h3>
                     {breakdown.slice(0, 5).map((item) => (
-                      <div key={item.category} className="flex justify-between text-xs py-1">
+                      <div key={item.category} className="flex justify-between text-sm py-1">
                         <span>{item.category} ({item.hours}h)</span>
                         <div className="flex gap-2">
                           {item.prod > 0 && <span className="text-blue-300">+{item.prod}P</span>}
@@ -1288,91 +1247,88 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                         </div>
                       </div>
                     ))}
-                    {breakdown.length > 5 && <p className="text-[10px] text-white/40 mt-1">+{breakdown.length - 5} more</p>}
+                    {breakdown.length > 5 && <p className="text-xs text-white/40 mt-2">+{breakdown.length - 5} more</p>}
                   </div>
                 )}
-                                <div className="bg-gradient-to-br from-pink-950/30 to-rose-950/20 backdrop-blur-xl border border-pink-400/20 rounded-2xl p-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">{persona.emoji}</span>
-                    <div>
-                      <p className="font-medium">{persona.title}</p>
-                      <p className="text-xs text-white/50">{persona.description}</p>
-                    </div>
+                <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5 flex items-center gap-3">
+                  <span className="text-3xl">{persona.emoji}</span>
+                  <div>
+                    <p className="font-medium">{persona.title}</p>
+                    <p className="text-xs text-white/50">{persona.description}</p>
                   </div>
                 </div>
-                <div className="flex gap-4 justify-center py-2">
+                <div className="flex gap-6 justify-center py-2 text-sm text-white/60">
                   <div className="text-center">
                     <span className="text-xl">🔥</span>
-                    <p className="text-xs">{streaks.currentStreak} day</p>
+                    <p>{streaks.currentStreak} day streak</p>
                   </div>
                   <div className="text-center">
                     <span className="text-xl">💪</span>
-                    <p className="text-xs">{streaks.highPerfStreak} high</p>
+                    <p>{streaks.highPerfStreak} high perf</p>
                   </div>
                 </div>
               </div>
             )}
           </div>
         )}
-
-        {currentTab === "log" && (
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-white/90">Get Today's Score</h2>
-                <button onClick={handleClearToday} className="text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 hover:scale-105 transition-all" style={{ touchAction: "manipulation" }}>
+                {currentTab === "log" && (
+          <div className="space-y-5">
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-lg font-light text-white/80">Today&apos;s Log</h2>
+                <button onClick={handleClearToday} className="text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 transition-colors">
                   Clear
                 </button>
               </div>
 
-              <div className="mb-4 p-3 bg-blue-500/10 border border-blue-400/30 rounded-xl">
-                <p className="text-xs text-blue-200/90 text-center">
-                  💡 Use <strong>Hourly</strong> for time-block planning OR <strong>Activity</strong> for quick bulk logging.
+              <div className="mb-5 p-3 bg-white/5 border border-white/10 rounded-xl">
+                <p className="text-xs text-white/60 text-center">
+                  Use <strong>Hourly</strong> for time blocks or <strong>Activity</strong> for bulk logging.
                 </p>
               </div>
 
               <div className="flex gap-2 p-1 bg-white/5 rounded-2xl mb-6">
                 <button
                   onClick={() => setActiveTab("hourly")}
-                  className={`flex-1 py-3 rounded-xl font-medium transition-all hover:scale-105 ${
+                  className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
                     activeTab === "hourly"
-                      ? "bg-gradient-to-r from-blue-500/30 to-cyan-500/30 text-white border border-white/20"
-                      : "text-white/60"
+                      ? "bg-white/15 text-white"
+                      : "text-white/50"
                   }`}
                   style={{ touchAction: "manipulation" }}
                 >
-                  ⏰ Hourly Log
+                  ⏰ Hourly
                 </button>
                 <button
                   onClick={() => setActiveTab("activity")}
-                  className={`flex-1 py-3 rounded-xl font-medium transition-all hover:scale-105 ${
+                  className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
                     activeTab === "activity"
-                      ? "bg-gradient-to-r from-green-500/30 to-lime-500/30 text-white border border-white/20"
-                      : "text-white/60"
+                      ? "bg-white/15 text-white"
+                      : "text-white/50"
                   }`}
                   style={{ touchAction: "manipulation" }}
                 >
-                  📋 Activity Log
+                  📋 Activity
                 </button>
               </div>
 
               {activeTab === "hourly" ? (
                 <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scroll">
-                  <p className="text-xs text-white/50 mb-2">Tap any hour to assign a category</p>
+                  <p className="text-xs text-white/40 mb-2">Tap any hour to assign a category</p>
                   {hours.map((hour) => {
                     const category = timelineData[hour];
                     return (
                       <div
                         key={hour}
                         onClick={() => setSelectedHour(hour)}
-                        className={`p-3 rounded-xl backdrop-blur-md cursor-pointer border hover:scale-[1.02] hover:border-white/40 transition-all ${
+                        className={`p-3 rounded-xl cursor-pointer border transition-all hover:border-white/30 ${
                           category ? blockStyles[category] : defaultBlockStyle
                         }`}
                         style={{ touchAction: "manipulation" }}
                       >
                         <div className="flex justify-between">
                           <span>{hour.toString().padStart(2, "0")}:00 — {(hour + 1).toString().padStart(2, "0")}:00</span>
-                          {category && <span className="text-xs px-2 py-1 rounded-full bg-black/40 border border-white/30">{category}</span>}
+                          {category && <span className="text-xs px-2 py-1 rounded-full bg-black/40 border border-white/20">{category}</span>}
                         </div>
                       </div>
                     );
@@ -1383,11 +1339,11 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                   <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
                     <div className="grid grid-cols-2 gap-3 mb-4">
                       <div>
-                        <label className="text-xs text-white/60 block mb-1">Category</label>
+                        <label className="text-xs text-white/40 block mb-1">Category</label>
                         <select
                           value={selectedCategory}
                           onChange={(e) => setSelectedCategory(e.target.value as Category)}
-                          className="w-full bg-black/30 border border-white/20 rounded-xl p-2.5 text-sm text-white"
+                          className="w-full bg-black/30 border border-white/10 rounded-xl p-2.5 text-sm text-white"
                         >
                           {categories.map((cat) => (
                             <option key={cat} value={cat} className="bg-gray-900">{cat}</option>
@@ -1395,7 +1351,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                         </select>
                       </div>
                       <div>
-                        <label className="text-xs text-white/60 block mb-1">Hours (1-12)</label>
+                        <label className="text-xs text-white/40 block mb-1">Hours (1-12)</label>
                         <input
                           type="text"
                           inputMode="numeric"
@@ -1408,13 +1364,13 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                             else if (val > 12) setHoursInput("12");
                             else setHoursInput(val.toString());
                           }}
-                          className="w-full bg-black/30 border border-white/20 rounded-xl p-2.5 text-sm text-white"
+                          className="w-full bg-black/30 border border-white/10 rounded-xl p-2.5 text-sm text-white"
                         />
                       </div>
                     </div>
                     <button
                       onClick={addActivityLog}
-                      className="w-full bg-gradient-to-r from-blue-500/30 to-cyan-500/30 border border-white/30 rounded-xl py-3 font-medium hover:scale-[1.01] transition-all"
+                      className="w-full bg-white/10 border border-white/10 rounded-xl py-3 text-sm font-medium hover:bg-white/15 transition-all"
                       style={{ touchAction: "manipulation" }}
                     >
                       + Add Entry
@@ -1423,9 +1379,9 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
 
                   {activityLogs.length > 0 && (
                     <div className="space-y-2">
-                      <p className="text-xs text-white/50 font-medium">Today's Activities</p>
+                      <p className="text-xs text-white/40 font-medium">Today&apos;s Activities</p>
                       {activityLogs.map((log, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-white/5 backdrop-blur-sm border border-white/15 rounded-xl">
+                        <div key={index} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl">
                           <div className="flex items-center gap-3">
                             <span className={`w-2 h-2 rounded-full ${
                               log.category === "Study" ? "bg-blue-400" :
@@ -1439,9 +1395,9 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                               log.category === "Gaming" ? "bg-cyan-400" : "bg-gray-400"
                             }`} />
                             <span className="font-medium">{log.category}</span>
-                            <span className="text-sm text-white/50">{log.hours}h</span>
+                            <span className="text-sm text-white/40">{log.hours}h</span>
                           </div>
-                          <button onClick={() => removeActivityLog(index)} className="text-white/40 hover:text-red-400 hover:scale-110 transition-all p-1" style={{ touchAction: "manipulation" }}>✕</button>
+                          <button onClick={() => removeActivityLog(index)} className="text-white/40 hover:text-red-400 transition-colors p-1">✕</button>
                         </div>
                       ))}
                     </div>
@@ -1449,13 +1405,12 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                 </div>
               )}
 
-              {/* Quick Log Widget */}
               <div className="mt-4 flex gap-2 justify-center">
                 {["Study", "Work", "Gym"].map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setActivityLogs([...activityLogs, { category: cat as Category, hours: 1 }])}
-                    className="bg-white/10 border border-white/20 rounded-full px-4 py-2 text-sm hover:scale-105 hover:bg-white/20 transition-all"
+                    className="bg-white/10 border border-white/10 rounded-full px-4 py-2 text-sm hover:bg-white/15 transition-all"
                     style={{ touchAction: "manipulation" }}
                   >
                     +1h {cat}
@@ -1465,7 +1420,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
 
               <button
                 onClick={handleDoneClick}
-                className="w-full mt-6 bg-gradient-to-r from-green-500/30 to-lime-500/30 border border-white/30 rounded-xl py-3 font-semibold hover:scale-[1.01] transition-all"
+                className="w-full mt-6 bg-white/10 border border-white/10 rounded-xl py-3 font-medium hover:bg-white/15 transition-all"
                 style={{ touchAction: "manipulation" }}
               >
                 ✅ Done
@@ -1473,24 +1428,25 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
             </div>
           </div>
         )}
-                {currentTab === "goals" && (
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-white/90">🎯 Daily Goals</h2>
-                <button onClick={handleClearPlanned} className="text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 hover:scale-105 transition-all" style={{ touchAction: "manipulation" }}>
+
+        {currentTab === "goals" && (
+          <div className="space-y-5">
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-lg font-light text-white/80">Daily Goals</h2>
+                <button onClick={handleClearPlanned} className="text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 transition-colors">
                   Clear
                 </button>
               </div>
 
-              <div className="bg-white/5 rounded-2xl p-4 border border-white/10 mb-4">
+              <div className="bg-white/5 rounded-2xl p-4 border border-white/10 mb-5">
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div>
-                    <label className="text-xs text-white/60 block mb-1">Category</label>
+                    <label className="text-xs text-white/40 block mb-1">Category</label>
                     <select
                       value={plannedCategory}
                       onChange={(e) => setPlannedCategory(e.target.value as Category)}
-                      className="w-full bg-black/30 border border-white/20 rounded-xl p-2.5 text-sm text-white"
+                      className="w-full bg-black/30 border border-white/10 rounded-xl p-2.5 text-sm text-white"
                     >
                       {categories.map((cat) => (
                         <option key={cat} value={cat} className="bg-gray-900">{cat}</option>
@@ -1498,7 +1454,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs text-white/60 block mb-1">Hours (1-12)</label>
+                    <label className="text-xs text-white/40 block mb-1">Hours (1-12)</label>
                     <input
                       type="text"
                       inputMode="numeric"
@@ -1511,13 +1467,13 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                         else if (val > 12) setPlannedHours("12");
                         else setPlannedHours(val.toString());
                       }}
-                      className="w-full bg-black/30 border border-white/20 rounded-xl p-2.5 text-sm text-white"
+                      className="w-full bg-black/30 border border-white/10 rounded-xl p-2.5 text-sm text-white"
                     />
                   </div>
                 </div>
                 <button
                   onClick={addPlannedLog}
-                  className="w-full bg-gradient-to-r from-purple-500/30 to-pink-500/30 border border-white/30 rounded-xl py-3 font-medium hover:scale-[1.01] transition-all"
+                  className="w-full bg-white/10 border border-white/10 rounded-xl py-3 text-sm font-medium hover:bg-white/15 transition-all"
                   style={{ touchAction: "manipulation" }}
                 >
                   + Add Goal
@@ -1526,27 +1482,27 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
 
               {plannedLogs.length > 0 && (
                 <div className="space-y-2 mb-6">
-                  <p className="text-xs text-white/50 font-medium">Planned Activities</p>
+                  <p className="text-xs text-white/40 font-medium">Planned Activities</p>
                   {plannedLogs.map((log, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-white/5 backdrop-blur-sm border border-white/15 rounded-xl">
+                    <div key={index} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl">
                       <div className="flex items-center gap-3">
                         <span className="font-medium">{log.category}</span>
-                        <span className="text-sm text-white/50">{log.hours}h</span>
+                        <span className="text-sm text-white/40">{log.hours}h</span>
                       </div>
-                      <button onClick={() => removePlannedLog(index)} className="text-white/40 hover:text-red-400 hover:scale-110 transition-all p-1" style={{ touchAction: "manipulation" }}>✕</button>
+                      <button onClick={() => removePlannedLog(index)} className="text-white/40 hover:text-red-400 transition-colors p-1">✕</button>
                     </div>
                   ))}
                 </div>
               )}
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 hover:scale-105 transition-all">
-                  <p className="text-xs text-white/60">Projected Productivity</p>
-                  <p className="text-3xl font-bold text-blue-300">{projectedScores.productivity}</p>
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <p className="text-xs text-white/40">Projected Productivity</p>
+                  <p className="text-3xl font-light text-blue-300">{projectedScores.productivity}</p>
                 </div>
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 hover:scale-105 transition-all">
-                  <p className="text-xs text-white/60">Projected Happiness</p>
-                  <p className="text-3xl font-bold text-green-300">{projectedScores.happiness}</p>
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <p className="text-xs text-white/40">Projected Happiness</p>
+                  <p className="text-3xl font-light text-green-300">{projectedScores.happiness}</p>
                 </div>
               </div>
             </div>
@@ -1554,17 +1510,17 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
         )}
 
         {currentTab === "insights" && (
-          <div className="max-w-2xl mx-auto space-y-5">
+          <div className="space-y-5">
             {/* Planned vs Actual */}
-            <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5 hover:scale-[1.01] transition-transform duration-200">
-              <h2 className="text-lg font-semibold mb-4 text-white/80">📋 Planned vs Actual</h2>
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <h2 className="text-xs font-medium uppercase tracking-widest text-white/50 mb-4">Planned vs Actual</h2>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span>Productivity</span>
                   <div className="flex items-center gap-2">
                     <span className="text-blue-300">{projectedScores.productivity}</span>
                     <span>→</span>
-                    <span className="text-blue-300 font-bold">{actualScores.productivity}</span>
+                    <span className="text-blue-300 font-medium">{actualScores.productivity}</span>
                     <span className={`text-sm ${prodDiff >= 0 ? "text-green-400" : "text-red-400"}`}>
                       ({prodDiff >= 0 ? "+" : ""}{prodDiff})
                     </span>
@@ -1575,31 +1531,23 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                   <div className="flex items-center gap-2">
                     <span className="text-green-300">{projectedScores.happiness}</span>
                     <span>→</span>
-                    <span className="text-green-300 font-bold">{actualScores.happiness}</span>
+                    <span className="text-green-300 font-medium">{actualScores.happiness}</span>
                     <span className={`text-sm ${happyDiff >= 0 ? "text-green-400" : "text-red-400"}`}>
                       ({happyDiff >= 0 ? "+" : ""}{happyDiff})
                     </span>
                   </div>
                 </div>
                 <div className="pt-3 border-t border-white/10">
-                  <p className="text-center font-medium">
-                    Status: {comparisonStatus}
-                  </p>
-                  <p className="text-sm text-white/60 text-center mt-1">
-                    {prodDiff >= 10 ? "You crushed your productivity goals! 🚀" :
-                     prodDiff <= -10 ? "Productivity fell short. Review your plan. 📉" :
-                     happyDiff <= -10 ? "Happiness took a hit. Prioritize joy tomorrow. 🌱" :
-                     "Good execution. Keep aligning actions with intentions."}
-                  </p>
+                  <p className="text-center font-medium">{comparisonStatus}</p>
                 </div>
               </div>
             </div>
 
-            {/* Smart Insights (Phase 7) */}
-            <div className="bg-gradient-to-r from-cyan-950/40 to-blue-950/40 backdrop-blur-xl border border-cyan-400/30 rounded-3xl p-5 hover:scale-[1.01] transition-transform">
-              <h2 className="text-lg font-semibold mb-4 text-white/80 flex items-center gap-2">
-                <span>🧠 Smart Insights</span>
-                <span className="text-xs bg-cyan-500/20 px-2 py-0.5 rounded-full">Last 7 Days</span>
+            {/* Smart Insights */}
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <h2 className="text-xs font-medium uppercase tracking-widest text-white/50 mb-4 flex items-center gap-2">
+                <span>Smart Insights</span>
+                <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">7 days</span>
               </h2>
               {history.length >= 3 ? (
                 <div className="space-y-3">
@@ -1607,7 +1555,6 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                     const last7 = [...history].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,7);
                     const avgProd = last7.reduce((s,d)=>s+d.productivity,0)/last7.length;
                     const avgHappy = last7.reduce((s,d)=>s+d.happiness,0)/last7.length;
-                    const gymDays = last7.filter(d => d.productivity > 60).length; // proxy
                     const insights = [];
                     if (hoursMap["Gym"] > 0 && actualScores.productivity > avgProd) {
                       insights.push({ emoji: "💪", text: "Gym days boost your productivity by ~15%" });
@@ -1622,27 +1569,28 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                       insights.push({ emoji: "📊", text: "Log more days to unlock personalized insights" });
                     }
                     return insights.slice(0,2).map((insight, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                      <div key={i} className="flex items-start gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
                         <span className="text-xl">{insight.emoji}</span>
-                        <p className="text-sm text-white/80">{insight.text}</p>
+                        <p className="text-sm text-white/70">{insight.text}</p>
                       </div>
                     ));
                   })()}
                 </div>
               ) : (
-                <p className="text-white/50 text-center py-4">Log at least 3 days for smart insights</p>
+                <p className="text-white/40 text-center py-4">Log at least 3 days for smart insights</p>
               )}
             </div>
-                        {/* Points Reference Table */}
-            <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-3xl p-5">
-              <h2 className="text-lg font-semibold mb-3 text-white/80">📋 Points Per Hour</h2>
+
+            {/* Points Reference */}
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <h2 className="text-xs font-medium uppercase tracking-widest text-white/50 mb-4">Points Per Hour</h2>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="border-b border-white/10">
-                      <th className="text-left py-2 text-white/60">Category</th>
-                      <th className="text-center py-2 text-blue-300">Productivity</th>
-                      <th className="text-center py-2 text-green-300">Happiness</th>
+                      <th className="text-left py-2 text-white/40">Category</th>
+                      <th className="text-center py-2 text-blue-300">Prod</th>
+                      <th className="text-center py-2 text-green-300">Happy</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1670,15 +1618,12 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                   </tbody>
                 </table>
               </div>
-              <p className="text-[10px] text-white/40 mt-3 text-center">
-                Values shown are per hour. Daily modifier may affect final scores.
-              </p>
             </div>
 
             {/* Mood-Energy Correlation */}
             {pulseEnergy && pulseMood && (
-              <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5 hover:scale-[1.01] transition-transform duration-200">
-                <h2 className="text-lg font-semibold mb-4 text-white/80">📈 Mood & Energy Impact</h2>
+              <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+                <h2 className="text-xs font-medium uppercase tracking-widest text-white/50 mb-4">Mood & Energy Impact</h2>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="w-20 text-sm">Energy:</span>
@@ -1692,21 +1637,17 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                       <div className={`h-full ${pulseMood === "😊" ? "bg-green-500" : pulseMood === "😐" ? "bg-yellow-500" : "bg-red-500"}`} style={{ width: pulseMood === "😊" ? "90%" : pulseMood === "😐" ? "60%" : "30%" }} />
                     </div>
                   </div>
-                  <p className="text-xs text-white/50 mt-2">
-                    {pulseEnergy === "high" && pulseMood === "😊" ? "Peak performance day! ⚡" :
-                     pulseEnergy === "low" ? "Low energy – be kind to yourself. 🌱" :
-                     "Moderate day – steady progress wins. 👍"}
-                  </p>
                 </div>
               </div>
             )}
 
-            <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5 hover:scale-[1.01] transition-transform duration-200">
-              <h2 className="text-lg font-semibold mb-4 text-white/80">📊 Daily Breakdown</h2>
+            {/* Daily Breakdown */}
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <h2 className="text-xs font-medium uppercase tracking-widest text-white/50 mb-4">Daily Breakdown</h2>
               {breakdown.length > 0 ? (
                 <div className="space-y-2">
                   {breakdown.map((item) => (
-                    <div key={item.category} className="flex flex-wrap items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div key={item.category} className="flex flex-wrap items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl">
                       <div className="flex items-center gap-3">
                         <span className={`w-2 h-2 rounded-full ${
                           item.category === "Study" ? "bg-blue-400" :
@@ -1720,7 +1661,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                           item.category === "Gaming" ? "bg-cyan-400" : "bg-gray-400"
                         }`} />
                         <span className="font-medium">{item.category}</span>
-                        <span className="text-sm text-white/50">{item.hours}h</span>
+                        <span className="text-sm text-white/40">{item.hours}h</span>
                       </div>
                       <div className="flex gap-4 text-sm">
                         {item.prod > 0 && <span className="text-blue-300">+{item.prod} Prod</span>}
@@ -1730,16 +1671,17 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                   ))}
                 </div>
               ) : (
-                <p className="text-white/50 text-center py-4">No data yet. Log some activities!</p>
+                <p className="text-white/40 text-center py-4">No data yet.</p>
               )}
             </div>
 
-            <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5 hover:scale-[1.01] transition-transform duration-200">
-              <h2 className="text-lg font-semibold mb-4 text-white/80">📈 History (Last 7 Days)</h2>
+            {/* History Last 7 Days */}
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <h2 className="text-xs font-medium uppercase tracking-widest text-white/50 mb-4">History (Last 7 Days)</h2>
               {history.length > 0 ? (
                 <div className="space-y-2">
                   {[...history].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,7).map((entry) => (
-                    <div key={entry.date} className="flex justify-between p-3 bg-white/5 rounded-xl">
+                    <div key={entry.date} className="flex justify-between p-3 bg-white/5 border border-white/10 rounded-xl">
                       <span>{entry.date}</span>
                       <div className="flex gap-4">
                         <span className="text-blue-300">P: {entry.productivity}</span>
@@ -1749,25 +1691,24 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                   ))}
                 </div>
               ) : (
-                <p className="text-white/50 text-center py-4">No history yet.</p>
+                <p className="text-white/40 text-center py-4">No history yet.</p>
               )}
             </div>
           </div>
         )}
 
         {currentTab === "profile" && (
-          <div className="max-w-2xl mx-auto space-y-5">
-            {/* RPG Character Stats Card */}
-            <div className="bg-gradient-to-br from-purple-950/60 to-indigo-950/60 backdrop-blur-xl border border-purple-400/30 rounded-3xl p-5">
-                            <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold text-white/80 flex items-center gap-2">
-                  <span>🎮 Character Stats</span>
-                  <span className="text-xs bg-purple-500/20 px-2 py-0.5 rounded-full">RPG</span>
+          <div className="space-y-5">
+            {/* RPG Character Stats */}
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xs font-medium uppercase tracking-widest text-white/50 flex items-center gap-2">
+                  <span>Character Stats</span>
+                  <span className="text-[10px] bg-purple-500/20 px-2 py-0.5 rounded-full">RPG</span>
                 </h2>
                 <button
                   onClick={() => setShowRpgInfo(true)}
-                  className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-sm hover:bg-white/20 transition-colors"
-                  style={{ touchAction: "manipulation" }}
+                  className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-sm hover:bg-white/15 transition-colors"
                 >
                   ?
                 </button>
@@ -1796,11 +1737,9 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-white/50 mt-4 text-center">
-                Gain XP by logging activities. 10 XP per hour.
-              </p>
             </div>
 
+            {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-4">
               {[
                 { label: "Total Hours", value: `${totalHours}h` },
@@ -1808,45 +1747,46 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                 { label: "Current Streak", value: `${streaks.currentStreak} 🔥` },
                 { label: "Badges Earned", value: `${unlockedBadges.length}/${badgesList.length}` },
               ].map((stat, idx) => (
-                <div key={idx} className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-2xl p-4 hover:scale-105 transition-transform duration-200">
-                  <p className="text-sm text-white/60">{stat.label}</p>
-                  <p className="text-3xl font-bold">{stat.value}</p>
+                <div key={idx} className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl p-4">
+                  <p className="text-xs text-white/40">{stat.label}</p>
+                  <p className="text-2xl font-light">{stat.value}</p>
                 </div>
               ))}
             </div>
 
             {bestDay && (
-              <div className="bg-gradient-to-r from-yellow-950/40 to-amber-950/40 backdrop-blur-xl border border-yellow-400/30 rounded-2xl p-4 hover:scale-[1.01] transition-transform">
-                <p className="text-sm text-yellow-200/80">🏆 Best Day</p>
-                <p className="text-lg font-semibold">{bestDay.date} — P: {bestDay.productivity} H: {bestDay.happiness}</p>
+              <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl p-4">
+                <p className="text-xs text-white/40">Best Day</p>
+                <p className="font-medium">{bestDay.date} — P: {bestDay.productivity} H: {bestDay.happiness}</p>
               </div>
             )}
 
             {/* Partner Setup */}
-            <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5 hover:scale-[1.01] transition-transform">
-              <h2 className="text-lg font-semibold mb-4 text-white/80">🤝 Accountability Partner</h2>
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <h2 className="text-xs font-medium uppercase tracking-widest text-white/50 mb-4">Accountability Partner</h2>
               <input
                 type="text"
                 value={partnerName}
                 onChange={(e) => setPartnerName(e.target.value)}
                 placeholder="Partner's name (optional)"
-                className="w-full bg-black/30 border border-white/20 rounded-xl p-3 text-white mb-2"
+                className="w-full bg-black/30 border border-white/10 rounded-xl p-3 text-white mb-2"
               />
-              <p className="text-xs text-white/50">Share your streak with a friend (local only).</p>
+              <p className="text-xs text-white/40">Share your streak with a friend (local only).</p>
             </div>
 
-            <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5">
-              <h2 className="text-lg font-semibold mb-4 text-white/80">🏅 Badges ({unlockedBadges.length}/{badgesList.length})</h2>
+            {/* Badges */}
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <h2 className="text-xs font-medium uppercase tracking-widest text-white/50 mb-4">Badges ({unlockedBadges.length}/{badgesList.length})</h2>
               <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-1 custom-scroll">
                 {badgesList.map((badge) => {
                   const unlocked = unlockedBadges.includes(badge.id);
                   return (
-                    <div key={badge.id} className={`p-3 rounded-xl border ${unlocked ? "bg-white/10 border-white/30" : "bg-white/5 border-white/10 opacity-50"}`}>
+                    <div key={badge.id} className={`p-3 rounded-xl border ${unlocked ? "bg-white/5 border-white/20" : "bg-white/[0.02] border-white/5 opacity-50"}`}>
                       <div className="flex items-center gap-2">
                         <span className="text-2xl">{badge.emoji}</span>
                         <div>
                           <p className="font-medium text-sm">{badge.name}</p>
-                          <p className="text-xs text-white/50">{badge.description}</p>
+                          <p className="text-xs text-white/40">{badge.description}</p>
                         </div>
                         {unlocked && <span className="ml-auto text-green-400">✓</span>}
                       </div>
@@ -1856,28 +1796,24 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
               </div>
             </div>
 
-            <div className="bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-5">
-              <h2 className="text-lg font-semibold mb-4 text-white/80">⚙️ Settings</h2>
+            {/* Settings */}
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <h2 className="text-xs font-medium uppercase tracking-widest text-white/50 mb-4">Settings</h2>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span>Sound Effects</span>
+                  <span className="text-sm">Sound Effects</span>
                   <button
                     onClick={() => setSoundEnabled(!soundEnabled)}
-                    className={`px-3 py-1 rounded-full transition-all hover:scale-105 ${soundEnabled ? "bg-green-500/30" : "bg-white/10"}`}
-                    style={{ touchAction: "manipulation" }}
+                    className={`px-3 py-1 rounded-full text-sm transition-colors ${soundEnabled ? "bg-white/10" : "bg-white/5"}`}
                   >
                     {soundEnabled ? "On" : "Off"}
                   </button>
                 </div>
-                <button
-                  onClick={exportData}
-                  className="w-full bg-blue-500/20 border border-blue-400/30 rounded-xl py-3 text-blue-300 hover:scale-[1.01] transition-all"
-                  style={{ touchAction: "manipulation" }}
-                >
-                  📤 Export Data
+                <button onClick={exportData} className="w-full bg-blue-500/10 border border-blue-400/20 rounded-xl py-3 text-sm text-blue-300 hover:bg-blue-500/20 transition-colors">
+                  Export Data
                 </button>
-                <label className="w-full bg-green-500/20 border border-green-400/30 rounded-xl py-3 text-green-300 text-center block cursor-pointer hover:scale-[1.01] transition-all">
-                  📥 Import Data
+                <label className="w-full bg-green-500/10 border border-green-400/20 rounded-xl py-3 text-sm text-green-300 text-center block cursor-pointer hover:bg-green-500/20 transition-colors">
+                  Import Data
                   <input type="file" accept=".json" onChange={importData} className="hidden" />
                 </label>
                 <button
@@ -1887,8 +1823,7 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                       window.location.reload();
                     }
                   }}
-                  className="w-full bg-red-500/20 border border-red-400/30 rounded-xl py-4 text-red-300 hover:scale-[1.01] transition-all"
-                  style={{ touchAction: "manipulation" }}
+                  className="w-full bg-red-500/10 border border-red-400/20 rounded-xl py-4 text-sm text-red-300 hover:bg-red-500/20 transition-colors"
                 >
                   Reset All Data
                 </button>
@@ -1896,26 +1831,25 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
             </div>
           </div>
         )}
-                {currentTab === "guide" && (
-          <div className="max-w-2xl mx-auto space-y-4">
-            <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-3xl p-5">
-              <h2 className="text-xl font-semibold mb-4 text-white/90">📖 Life OS Guide</h2>
-              <p className="text-sm text-white/60 mb-4">Everything you need to know, explained simply.</p>
-              
+
+        {currentTab === "guide" && (
+          <div className="space-y-4">
+            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5">
+              <h2 className="text-lg font-light text-white/80 mb-4">Life OS Guide</h2>
               <div className="space-y-3">
                 {[
-                  { title: "🏠 Home Tab", content: "Your dashboard. See daily scores, identity panel, pulse check-in, smart suggestions, and expandable details (challenges, point sources, persona, streaks)." },
+                  { title: "🏠 Home Tab", content: "Your dashboard. See daily scores, identity panel, pulse check-in, smart suggestions, and expandable details." },
                   { title: "📝 Log Tab", content: "Track activities two ways: Hourly (assign each hour a category) or Activity (bulk log hours). This builds your daily scores." },
                   { title: "🎯 Goals Tab", content: "Plan your ideal day. Compare projected vs actual scores to see how well you executed." },
-                  { title: "📊 Insights Tab", content: "View planned vs actual, smart correlations (last 7 days), mood-energy impact, daily breakdown, and points reference table." },
-                  { title: "👤 Profile Tab", content: "RPG character stats, badges earned, accountability partner, and data management (export/import/reset)." },
-                  { title: "🎮 RPG System", content: "Every logged hour = 10 XP. 100 XP = 1 Level. Stats (INT, STR, CHA, VIT, SPR) grow based on categories. Purely for role-play and insight." },
+                  { title: "📊 Insights Tab", content: "View planned vs actual, smart correlations, mood-energy impact, daily breakdown, and points reference table." },
+                  { title: "👤 Profile Tab", content: "RPG character stats, badges earned, accountability partner, and data management." },
+                  { title: "🎮 RPG System", content: "Every logged hour = 10 XP. 100 XP = 1 Level. Stats grow based on categories. Purely for role-play and insight." },
                   { title: "🪙 Tokens", content: "Earn tokens from Study/Work/Gym. Spend on Gaming/Rest. Low tokens reduce happiness gain." },
-                  { title: "🧘 Daily Modifier", content: "Each day has a random modifier (Monk Mode, Social Boost, Recovery Day) that multiplies productivity or happiness." },
+                  { title: "🧘 Daily Modifier", content: "Each day has a random modifier that multiplies productivity or happiness." },
                   { title: "⚡ Pulse", content: "Quick daily check-in: Energy, Mood, Intention. Get witty feedback based on your combination." },
                   { title: "🏅 Badges & Challenges", content: "Unlock badges for milestones. Weekly challenges appear on Home to guide your focus." },
                 ].map((item, idx) => (
-                  <details key={idx} className="group bg-white/5 rounded-xl border border-white/10">
+                  <details key={idx} className="group bg-white/5 border border-white/10 rounded-xl">
                     <summary className="p-4 font-medium cursor-pointer list-none flex items-center justify-between">
                       <span>{item.title}</span>
                       <span className="text-white/50 group-open:rotate-90 transition-transform">▶</span>
@@ -1930,8 +1864,8 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
           </div>
         )}
 
-              {/* Floating Coach Button with Label */}
-        <div className="fixed bottom-6 right-6 z-40 flex flex-col items-center gap-1">
+        {/* Floating Coach Button */}
+        <div className="fixed bottom-8 right-8 z-40 flex flex-col items-center gap-1">
           <button
             onClick={() => {
               if (typeof window !== "undefined" && sessionStorage.getItem("onboarding_logging") === "true") {
@@ -1942,143 +1876,100 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                 setCurrentTab("guide");
               }
             }}
-            className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg border border-white/30 flex items-center justify-center text-2xl animate-bounce-slow hover:scale-110 transition-transform"
+            className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center text-2xl hover:bg-white/15 transition-all"
             style={{ touchAction: "manipulation" }}
           >
             ✨
           </button>
-          <span className="text-xs bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full text-white/80 border border-white/20">
+          <span className="text-xs bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full text-white/70 border border-white/10">
             Guide
           </span>
         </div>
-            
-{/* Coach Guide Modal - Enhanced */}
-{showCoachModal && (
-  <>
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-40" onClick={() => setShowCoachModal(false)} />
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-3xl p-6 w-full max-w-lg max-h-[85vh] overflow-y-auto custom-scroll">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-2xl font-semibold flex items-center gap-2">
-            <span>✨</span> Life OS Guide
-          </h3>
-          <button onClick={() => setShowCoachModal(false)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20">✕</button>
-        </div>
-        
-        <div className="space-y-3">
-          {[
-            {
-              title: "🏠 Home Tab",
-              content: "Your dashboard. See scores, daily modifier, pulse, challenges, persona, and week view. The identity panel shows your level, XP, and tokens."
-            },
-            {
-              title: "⚡ Pulse Check-in",
-              content: "Log your energy, mood, and intention each day. Based on your combination, you'll get a witty, personalized feedback message. Redo anytime."
-            },
-            {
-              title: "📝 Log Tab",
-              content: "Track activities two ways: Hourly (time-block each hour) or Activity (bulk log hours). This builds your daily productivity and happiness scores."
-            },
-            {
-              title: "🎯 Goals Tab",
-              content: "Plan your ideal day. Compare projected scores vs actual at the end. Helps you set intentions and reflect on execution."
-            },
-            {
-              title: "📊 Insights Tab",
-              content: "Smart analysis of your last 7 days. See correlations (e.g., Gym → higher productivity) and a breakdown of where your scores come from."
-            },
-            {
-              title: "👤 Profile Tab",
-              content: "RPG character stats (INT, STR, CHA, VIT, SPR) grow as you log activities. View badges, set an accountability partner, and manage data."
-            },
-            {
-              title: "🎮 RPG & Leveling",
-              content: "Every logged hour gives 10 XP. Level up every 100 XP. Higher levels unlock new rank titles. Stats increase based on category: Study/Work = INT, Gym/Sports = STR, etc."
-            },
-            {
-              title: "🪙 Token Economy",
-              content: "Earn tokens from Study, Work, Gym. Spend them on Gaming or Rest. If you're out of tokens, happiness gain from those activities is halved."
-            },
-            {
-              title: "🧘 Daily Modifier",
-              content: "Each day has a random modifier (Monk Mode, Social Boost, Recovery Day) that multiplies productivity or happiness gains."
-            },
-            {
-              title: "🏅 Badges & Challenges",
-              content: "Unlock badges for milestones (streaks, high scores, category hours). Weekly challenges appear on Home to guide your focus."
-            },
-          ].map((item, idx) => (
-            <details key={idx} className="group bg-white/5 rounded-xl border border-white/10">
-              <summary className="p-4 font-medium cursor-pointer list-none flex items-center justify-between">
-                <span>{item.title}</span>
-                <span className="text-white/50 group-open:rotate-90 transition-transform">▶</span>
-              </summary>
-              <div className="px-4 pb-4 text-sm text-white/70 border-t border-white/10 pt-3">
-                {item.content}
+                {/* Coach Guide Modal */}
+        {showCoachModal && (
+          <>
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40" onClick={() => setShowCoachModal(false)} />
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-6 w-full max-w-lg max-h-[85vh] overflow-y-auto custom-scroll">
+                <div className="flex items-center justify-between mb-5">
+                  <h3 className="text-lg font-light">✨ Life OS Guide</h3>
+                  <button onClick={() => setShowCoachModal(false)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/15">✕</button>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    { title: "🏠 Home Tab", content: "Your dashboard. See scores, daily modifier, pulse, challenges, persona, and week view." },
+                    { title: "⚡ Pulse Check-in", content: "Log your energy, mood, and intention each day. Get a witty, personalized feedback message." },
+                    { title: "📝 Log Tab", content: "Track activities two ways: Hourly (time-block each hour) or Activity (bulk log hours)." },
+                    { title: "🎯 Goals Tab", content: "Plan your ideal day. Compare projected vs actual scores." },
+                    { title: "📊 Insights Tab", content: "Smart analysis of your last 7 days. See correlations and a breakdown of scores." },
+                    { title: "👤 Profile Tab", content: "RPG stats, badges, accountability partner, and data management." },
+                    { title: "🎮 RPG & Leveling", content: "Every logged hour gives 10 XP. Level up every 100 XP. Stats increase based on category." },
+                    { title: "🪙 Token Economy", content: "Earn tokens from Study/Work/Gym. Spend on Gaming or Rest. Out of tokens? Happiness gain halved." },
+                    { title: "🧘 Daily Modifier", content: "Each day has a random modifier that multiplies productivity or happiness gains." },
+                    { title: "🏅 Badges & Challenges", content: "Unlock badges for milestones. Weekly challenges appear on Home." },
+                  ].map((item, idx) => (
+                    <details key={idx} className="group bg-white/5 border border-white/10 rounded-xl">
+                      <summary className="p-4 font-medium cursor-pointer list-none flex items-center justify-between">
+                        <span>{item.title}</span>
+                        <span className="text-white/50 group-open:rotate-90 transition-transform">▶</span>
+                      </summary>
+                      <div className="px-4 pb-4 text-sm text-white/70 border-t border-white/10 pt-3">
+                        {item.content}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+                {totalLogs === 0 && (
+                  <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-400/20 rounded-xl">
+                    <p className="text-sm text-yellow-200">💡 Start by logging an activity in the Log tab!</p>
+                  </div>
+                )}
               </div>
-            </details>
-          ))}
-        </div>
-        
-        {/* Smart hint based on current state */}
-        {totalLogs === 0 && (
-          <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-xl">
-            <p className="text-sm text-yellow-200">💡 Tip: Start by logging an activity in the Log tab!</p>
-          </div>
+            </div>
+          </>
         )}
-        {plannedLogs.length === 0 && totalLogs > 0 && (
-          <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-xl">
-            <p className="text-sm text-yellow-200">💡 Tip: Set daily goals in the Goals tab to stay focused.</p>
-          </div>
-        )}
-      </div>
-    </div>
-  </>
-)}
 
-        {/* Name Input Modal (First Visit) */}
+        {/* Name Input Modal */}
         {showNameModal && (
           <>
-            <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-50" />
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50" />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-3xl p-6 w-full max-w-sm">
-                <h3 className="text-xl font-semibold mb-2">Welcome to Life OS</h3>
-                <p className="text-sm text-white/60 mb-4">What should we call you?</p>
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-6 w-full max-w-sm">
+                <h3 className="text-lg font-light mb-2">Welcome to Life OS</h3>
+                <p className="text-sm text-white/50 mb-4">What should we call you?</p>
                 <input
                   type="text"
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
                   placeholder="Your name"
-                  className="w-full bg-black/30 border border-white/20 rounded-xl p-3 text-white mb-4"
+                  className="w-full bg-black/30 border border-white/10 rounded-xl p-3 text-white mb-4"
                   autoFocus
                 />
                 <button
                   onClick={handleNameSave}
                   disabled={!userName.trim()}
-                  className="w-full bg-gradient-to-r from-blue-500/40 to-cyan-500/40 border border-white/30 rounded-xl py-3 font-medium disabled:opacity-30"
-                  style={{ touchAction: "manipulation" }}
+                  className="w-full bg-white/10 border border-white/10 rounded-xl py-3 font-medium disabled:opacity-30"
                 >
-                  Let's Go
+                  Let&apos;s Go
                 </button>
               </div>
             </div>
           </>
         )}
 
-        {/* Onboarding Walkthrough Modal (Phase 2) */}
+        {/* Onboarding Walkthrough */}
         {showOnboarding && (
           <>
-            <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-50" />
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50" />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-3xl p-6 w-full max-w-sm">
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-6 w-full max-w-sm">
                 {onboardingStep === 0 && (
                   <>
-                    <h3 className="text-2xl font-bold mb-2">Welcome, {userName}! 🌱</h3>
-                    <p className="text-white/70 mb-6">Let's set up your journey. This will take 1 minute.</p>
+                    <h3 className="text-xl font-light mb-2">Welcome, {userName}! 🌱</h3>
+                    <p className="text-white/50 mb-6">Let&apos;s set up your journey. This will take 1 minute.</p>
                     <button
                       onClick={() => setOnboardingStep(1)}
-                      className="w-full bg-gradient-to-r from-green-500/40 to-lime-500/40 py-3 rounded-xl"
-                      style={{ touchAction: "manipulation" }}
+                      className="w-full bg-white/10 border border-white/10 py-3 rounded-xl"
                     >
                       Get Started
                     </button>
@@ -2086,12 +1977,11 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                 )}
                 {onboardingStep === 1 && (
                   <>
-                    <h3 className="text-xl font-semibold mb-2">Step 1: Check-in ⚡</h3>
-                    <p className="text-white/70 mb-4">How are you feeling today?</p>
-                    
+                    <h3 className="text-lg font-light mb-2">Step 1: Check-in ⚡</h3>
+                    <p className="text-white/50 mb-4">How are you feeling today?</p>
                     {/* Energy */}
                     <div className="mb-4">
-                      <p className="text-sm text-white/60 mb-2">Energy</p>
+                      <p className="text-xs text-white/40 mb-2">Energy</p>
                       <div className="grid grid-cols-4 gap-2">
                         {[
                           { value: "low", label: "🥱 Low" },
@@ -2103,42 +1993,34 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                             key={value}
                             onClick={() => setPulseEnergy(value as any)}
                             className={`py-2.5 rounded-xl border text-sm transition-all ${
-                              pulseEnergy === value
-                                ? "bg-gradient-to-r from-blue-500/40 to-cyan-500/40 border-white/40"
-                                : "bg-white/5 border-white/15"
+                              pulseEnergy === value ? "bg-white/10 border-white/30" : "bg-white/5 border-white/10"
                             }`}
-                            style={{ touchAction: "manipulation" }}
                           >
                             {label}
                           </button>
                         ))}
                       </div>
                     </div>
-
                     {/* Mood */}
                     <div className="mb-4">
-                      <p className="text-sm text-white/60 mb-2">Mood</p>
+                      <p className="text-xs text-white/40 mb-2">Mood</p>
                       <div className="grid grid-cols-3 gap-2">
                         {["😊", "😐", "😤", "😢", "🤩", "😴"].map((mood) => (
                           <button
                             key={mood}
                             onClick={() => setPulseMood(mood as any)}
                             className={`py-2.5 rounded-xl border text-xl ${
-                              pulseMood === mood
-                                ? "bg-gradient-to-r from-green-500/40 to-lime-500/40 border-white/40"
-                                : "bg-white/5 border-white/15"
+                              pulseMood === mood ? "bg-white/10 border-white/30" : "bg-white/5 border-white/10"
                             }`}
-                            style={{ touchAction: "manipulation" }}
                           >
                             {mood}
                           </button>
                         ))}
                       </div>
                     </div>
-
                     {/* Intention */}
                     <div className="mb-6">
-                      <p className="text-sm text-white/60 mb-2">Intention</p>
+                      <p className="text-xs text-white/40 mb-2">Intention</p>
                       <div className="grid grid-cols-3 gap-2">
                         {[
                           { value: "Work", emoji: "💼" },
@@ -2151,35 +2033,23 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                             key={value}
                             onClick={() => setPulseIntention(value as any)}
                             className={`py-2.5 rounded-xl border text-sm ${
-                              pulseIntention === value
-                                ? "bg-gradient-to-r from-purple-500/40 to-pink-500/40 border-white/40"
-                                : "bg-white/5 border-white/15"
+                              pulseIntention === value ? "bg-white/10 border-white/30" : "bg-white/5 border-white/10"
                             }`}
-                            style={{ touchAction: "manipulation" }}
                           >
                             {emoji} {value}
                           </button>
                         ))}
                       </div>
                     </div>
-
                     <div className="flex gap-3">
-                      <button
-                        onClick={() => setOnboardingStep(0)}
-                        className="flex-1 bg-white/10 py-3 rounded-xl"
-                      >
-                        Back
-                      </button>
+                      <button onClick={() => setOnboardingStep(0)} className="flex-1 bg-white/5 py-3 rounded-xl">Back</button>
                       <button
                         onClick={() => {
                           handlePulseSubmit();
                           setOnboardingStep(2);
                         }}
                         disabled={!pulseEnergy || !pulseMood || !pulseIntention}
-                        className={`flex-1 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 py-3 rounded-xl ${
-                          !pulseEnergy || !pulseMood || !pulseIntention ? "opacity-50" : ""
-                        }`}
-                        style={{ touchAction: "manipulation" }}
+                        className={`flex-1 bg-white/10 py-3 rounded-xl ${!pulseEnergy || !pulseMood || !pulseIntention ? "opacity-50" : ""}`}
                       >
                         Save & Continue
                       </button>
@@ -2187,74 +2057,44 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
                   </>
                 )}
                 {onboardingStep === 2 && (
-  <>
-    <h3 className="text-xl font-semibold mb-2">Step 2: Log Activity 📝</h3>
-    <p className="text-white/70 mb-4">
-      Go to the Log tab and add at least one activity (hourly or bulk).
-    </p>
-    <button
-      onClick={() => {
-        // Close onboarding modal temporarily so user can access Log tab
-        setShowOnboarding(false);
-        setCurrentTab("log");
-        // We'll use a flag to know they're in logging mode
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem("onboarding_logging", "true");
-        }
-      }}
-      className="w-full bg-white/10 py-3 rounded-xl mb-4"
-    >
-      Go to Log Tab
-    </button>
-    <p className="text-xs text-white/50 mb-4 text-center">
-      After logging, click the ✨ coach button to resume onboarding.
-    </p>
-    <div className="flex gap-3">
-      <button
-        onClick={() => setOnboardingStep(1)}
-        className="flex-1 bg-white/10 py-3 rounded-xl"
-      >
-        Back
-      </button>
-      <button
-        onClick={() => setOnboardingStep(3)}
-        className="flex-1 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 py-3 rounded-xl"
-      >
-        I've Logged It
-      </button>
-    </div>
-  </>
-)}
+                  <>
+                    <h3 className="text-lg font-light mb-2">Step 2: Log Activity 📝</h3>
+                    <p className="text-white/50 mb-4">Go to the Log tab and add at least one activity.</p>
+                    <button
+                      onClick={() => {
+                        setShowOnboarding(false);
+                        setCurrentTab("log");
+                        if (typeof window !== "undefined") sessionStorage.setItem("onboarding_logging", "true");
+                      }}
+                      className="w-full bg-white/10 py-3 rounded-xl mb-4"
+                    >
+                      Go to Log Tab
+                    </button>
+                    <p className="text-xs text-white/40 mb-4 text-center">After logging, tap the ✨ coach button to resume.</p>
+                    <div className="flex gap-3">
+                      <button onClick={() => setOnboardingStep(1)} className="flex-1 bg-white/5 py-3 rounded-xl">Back</button>
+                      <button onClick={() => setOnboardingStep(3)} className="flex-1 bg-white/10 py-3 rounded-xl">I&apos;ve Logged It</button>
+                    </div>
+                  </>
+                )}
                 {onboardingStep === 3 && (
                   <>
-                    <h3 className="text-xl font-semibold mb-2">🎉 Reward Unlocked!</h3>
-                    <p className="text-white/70 mb-4">You earned the "First Steps" badge!</p>
+                    <h3 className="text-lg font-light mb-2">🎉 Reward Unlocked!</h3>
+                    <p className="text-white/50 mb-4">You earned the &quot;First Steps&quot; badge!</p>
                     <div className="text-center text-6xl mb-4">🎯</div>
-                    <button
-                      onClick={() => setOnboardingStep(4)}
-                      className="w-full bg-gradient-to-r from-yellow-500/40 to-amber-500/40 py-3 rounded-xl"
-                      style={{ touchAction: "manipulation" }}
-                    >
-                      Next
-                    </button>
+                    <button onClick={() => setOnboardingStep(4)} className="w-full bg-white/10 py-3 rounded-xl">Next</button>
                   </>
                 )}
                 {onboardingStep === 4 && (
                   <>
-                    <h3 className="text-xl font-semibold mb-2">Meet Your Coach ✨</h3>
-                    <p className="text-white/70 mb-4">Tap the ✨ button anytime for guidance.</p>
+                    <h3 className="text-lg font-light mb-2">Meet Your Coach ✨</h3>
+                    <p className="text-white/50 mb-4">Tap the ✨ button anytime for guidance.</p>
                     <div className="flex justify-center mb-6">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl animate-pulse">
+                      <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-3xl">
                         ✨
                       </div>
                     </div>
-                    <button
-                      onClick={completeOnboarding}
-                      className="w-full bg-gradient-to-r from-green-500/40 to-lime-500/40 py-3 rounded-xl"
-                      style={{ touchAction: "manipulation" }}
-                    >
-                      Start Your Journey
-                    </button>
+                    <button onClick={completeOnboarding} className="w-full bg-white/10 py-3 rounded-xl">Start Your Journey</button>
                   </>
                 )}
               </div>
@@ -2265,128 +2105,93 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
         {/* Reflection Modal */}
         {showReflectionModal && (
           <>
-            <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-40" onClick={() => setShowReflectionModal(false)} />
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40" onClick={() => setShowReflectionModal(false)} />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="bg-gray-900/90 backdrop-blur-xl border border-white/20 rounded-3xl p-6 w-full max-w-md">
-                <h3 className="text-xl font-semibold mb-4">Daily Reflection</h3>
-                <p className="text-sm text-white/60 mb-3">What went well today? What could improve?</p>
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-6 w-full max-w-md">
+                <h3 className="text-lg font-light mb-4">Daily Reflection</h3>
+                <p className="text-sm text-white/50 mb-3">What went well today? What could improve?</p>
                 <textarea
                   value={reflectionInput}
                   onChange={(e) => setReflectionInput(e.target.value)}
-                  className="w-full bg-black/30 border border-white/20 rounded-xl p-3 text-white h-24 resize-none"
+                  className="w-full bg-black/30 border border-white/10 rounded-xl p-3 text-white h-24 resize-none"
                   placeholder="Write your thoughts..."
                 />
                 <div className="flex gap-3 mt-4">
-                  <button
-                    onClick={handleReflectionSubmit}
-                    className="flex-1 bg-gradient-to-r from-green-500/30 to-lime-500/30 py-3 rounded-xl hover:scale-105 transition-all"
-                    style={{ touchAction: "manipulation" }}
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => setShowReflectionModal(false)}
-                    className="flex-1 bg-white/10 py-3 rounded-xl hover:scale-105 transition-all"
-                    style={{ touchAction: "manipulation" }}
-                  >
-                    Skip
-                  </button>
+                  <button onClick={handleReflectionSubmit} className="flex-1 bg-white/10 py-3 rounded-xl">Save</button>
+                  <button onClick={() => setShowReflectionModal(false)} className="flex-1 bg-white/5 py-3 rounded-xl">Skip</button>
                 </div>
               </div>
             </div>
           </>
         )}
 
-        {/* Score Modal (Phase 8: Daily Verdict) */}
+        {/* Score Modal (Daily Verdict) */}
         {showScoreModal && (
           <>
-            <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-40 animate-fade-in" onClick={handleScoreModalClose} />
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 animate-fade-in" onClick={handleScoreModalClose} />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-scale-up">
               <div className="w-full max-w-lg">
-                <button onClick={handleScoreModalClose} className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/80 hover:bg-white/20 hover:scale-110 transition-all z-50" style={{ touchAction: "manipulation" }}>✕</button>
-                
-                {/* Verdict Title */}
+                <button onClick={handleScoreModalClose} className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white/80 hover:bg-white/15 transition-all z-50">✕</button>
                 <div className="text-center mb-6">
-                  <h2 className="text-3xl font-bold">
+                  <h2 className="text-2xl font-light">
                     {actualScores.productivity >= 70 && actualScores.happiness >= 70 ? "⚖️ Balanced" :
                      actualScores.productivity >= 70 ? "🏗️ Overworked" :
-                     actualScores.happiness >= 70 ? "🦋 Joyful" : "🌱 Underperformed"}
+                     actualScores.happiness >= 70 ? "🦋 Joyful" : "🌱 Light Day"}
                   </h2>
-                  <p className="text-white/60 mt-1">
+                  <p className="text-white/50 mt-1 text-sm">
                     {actualScores.productivity >= 70 && actualScores.happiness >= 70 ? "You're in harmony. Keep this rhythm." :
                      actualScores.productivity >= 70 ? "Crushing work, but watch your happiness." :
                      actualScores.happiness >= 70 ? "Great mood! Maybe channel some into productivity." :
                      "Today was light. Tomorrow is a fresh start."}
                   </p>
                 </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-950/80 to-black/60 backdrop-blur-xl border border-blue-400/40 p-8 hover:scale-[1.02] transition-transform">
-                    <div className="absolute -top-16 -right-16 w-32 h-32 bg-blue-500/40 rounded-full blur-3xl" />
-                    <p className="text-lg font-semibold text-blue-200/90 uppercase mb-2">Productivity</p>
-                    <p className="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-cyan-200">{actualScores.productivity}</p>
-                    <div className="mt-6 w-full h-3 bg-white/10 rounded-full">
-                      <div className={`h-full bg-gradient-to-r ${getProductivityColor(actualScores.productivity)}`} style={{ width: `${actualScores.productivity}%` }} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-6 text-center">
+                    <p className="text-xs uppercase tracking-widest text-blue-200/80 mb-2">Productivity</p>
+                    <p className="text-6xl font-light text-blue-200">{actualScores.productivity}</p>
+                    <div className="mt-4 w-full h-1.5 bg-white/10 rounded-full">
+                      <div className={`h-full bg-gradient-to-r ${getProductivityColor(actualScores.productivity)} rounded-full`} style={{ width: `${actualScores.productivity}%` }} />
                     </div>
-                    {projectedScores.productivity > 0 && (
-                      <p className="text-sm text-blue-200/60 mt-2">Projected: {projectedScores.productivity}</p>
-                    )}
                   </div>
-                  <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-lime-950/80 to-black/60 backdrop-blur-xl border border-green-400/40 p-8 hover:scale-[1.02] transition-transform">
-                    <div className="absolute -top-16 -right-16 w-32 h-32 bg-lime-500/40 rounded-full blur-3xl" />
-                    <p className="text-lg font-semibold text-lime-200/90 uppercase mb-2">Happiness</p>
-                    <p className="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-lime-200 to-green-200">{actualScores.happiness}</p>
-                    <div className="mt-6 w-full h-3 bg-white/10 rounded-full">
-                      <div className={`h-full bg-gradient-to-r ${getHappinessColor(actualScores.happiness)}`} style={{ width: `${actualScores.happiness}%` }} />
+                  <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-6 text-center">
+                    <p className="text-xs uppercase tracking-widest text-lime-200/80 mb-2">Happiness</p>
+                    <p className="text-6xl font-light text-lime-200">{actualScores.happiness}</p>
+                    <div className="mt-4 w-full h-1.5 bg-white/10 rounded-full">
+                      <div className={`h-full bg-gradient-to-r ${getHappinessColor(actualScores.happiness)} rounded-full`} style={{ width: `${actualScores.happiness}%` }} />
                     </div>
-                    {projectedScores.happiness > 0 && (
-                      <p className="text-sm text-lime-200/60 mt-2">Projected: {projectedScores.happiness}</p>
-                    )}
                   </div>
                 </div>
-
-                {/* Additional Three Scores */}
                 <div className="grid grid-cols-3 gap-3 mt-4">
                   <div className="bg-white/5 rounded-xl p-3 text-center">
-                    <p className="text-xs text-white/50">Balance</p>
-                    <p className="text-xl font-bold text-purple-300">{balanceScore}</p>
+                    <p className="text-xs text-white/40">Balance</p>
+                    <p className="text-xl font-light text-purple-300">{balanceScore}</p>
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 text-center">
-                    <p className="text-xs text-white/50">Focus</p>
-                    <p className="text-xl font-bold text-amber-300">{focusScore}</p>
+                    <p className="text-xs text-white/40">Focus</p>
+                    <p className="text-xl font-light text-amber-300">{focusScore}</p>
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 text-center">
-                    <p className="text-xs text-white/50">Recovery</p>
-                    <p className="text-xl font-bold text-teal-300">{recoveryScore}</p>
+                    <p className="text-xs text-white/40">Recovery</p>
+                    <p className="text-xl font-light text-teal-300">{recoveryScore}</p>
                   </div>
                 </div>
-
-                {/* Goals vs Actual summary */}
                 {plannedLogs.length > 0 && (
-                  <div className="mt-6 p-4 bg-white/5 rounded-2xl border border-white/10">
+                  <div className="mt-5 p-4 bg-white/5 rounded-2xl border border-white/10">
                     <p className="text-sm font-medium mb-2">Goals vs Actual</p>
                     <div className="flex justify-between text-sm">
                       <span>Productivity: {projectedScores.productivity} → {actualScores.productivity}</span>
-                      <span className={prodDiff >= 0 ? "text-green-400" : "text-red-400"}>
-                        {prodDiff >= 0 ? "+" : ""}{prodDiff}
-                      </span>
+                      <span className={prodDiff >= 0 ? "text-green-400" : "text-red-400"}>{prodDiff >= 0 ? "+" : ""}{prodDiff}</span>
                     </div>
                     <div className="flex justify-between text-sm mt-1">
                       <span>Happiness: {projectedScores.happiness} → {actualScores.happiness}</span>
-                      <span className={happyDiff >= 0 ? "text-green-400" : "text-red-400"}>
-                        {happyDiff >= 0 ? "+" : ""}{happyDiff}
-                      </span>
+                      <span className={happyDiff >= 0 ? "text-green-400" : "text-red-400"}>{happyDiff >= 0 ? "+" : ""}{happyDiff}</span>
                     </div>
                   </div>
                 )}
-
                 <div className="mt-6 text-center">
-                  <p className="text-xl font-medium text-white/90">{getFeedbackMessage(actualScores.productivity, actualScores.happiness)}</p>
+                  <p className="text-lg font-medium">{getFeedbackMessage(actualScores.productivity, actualScores.happiness)}</p>
                   <p className="text-sm text-white/50 mt-2">{getDailyInsight()}</p>
-                  <button
-                    onClick={handleScoreModalClose}
-                    className="mt-4 px-6 py-2 bg-white/10 rounded-full hover:bg-white/20 transition-all"
-                  >
+                  <button onClick={handleScoreModalClose} className="mt-4 px-6 py-2 bg-white/10 rounded-full hover:bg-white/15 transition-colors">
                     Continue
                   </button>
                 </div>
@@ -2398,23 +2203,21 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
         {/* RPG Info Modal */}
         {showRpgInfo && (
           <>
-            <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-50" onClick={() => setShowRpgInfo(false)} />
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50" onClick={() => setShowRpgInfo(false)} />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-3xl p-6 w-full max-w-md">
-                <h3 className="text-xl font-semibold mb-4">📖 RPG System Guide</h3>
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-6 w-full max-w-md">
+                <h3 className="text-lg font-light mb-4">RPG System Guide</h3>
                 <div className="space-y-3 text-sm">
-                  <p><span className="font-medium text-blue-300">🧠 INT (Intelligence):</span> Grows with Study & Work. Represents mental focus.</p>
-                  <p><span className="font-medium text-red-300">💪 STR (Strength):</span> Grows with Gym & Sports. Physical power.</p>
-                  <p><span className="font-medium text-green-300">🫂 CHA (Charisma):</span> Grows with Social time. Connection skill.</p>
-                  <p><span className="font-medium text-purple-300">❤️ VIT (Vitality):</span> Grows with Sleep, Rest, and Meals. Recovery capacity.</p>
-                  <p><span className="font-medium text-pink-300">✨ SPR (Spirit):</span> Grows with Personal Hobby. Creative energy.</p>
+                  <p><span className="font-medium text-blue-300">🧠 INT:</span> Grows with Study & Work. Mental focus.</p>
+                  <p><span className="font-medium text-red-300">💪 STR:</span> Grows with Gym & Sports. Physical power.</p>
+                  <p><span className="font-medium text-green-300">🫂 CHA:</span> Grows with Social time. Connection skill.</p>
+                  <p><span className="font-medium text-purple-300">❤️ VIT:</span> Grows with Sleep, Rest, and Meals. Recovery.</p>
+                  <p><span className="font-medium text-pink-300">✨ SPR:</span> Grows with Personal Hobby. Creative energy.</p>
                   <div className="border-t border-white/10 pt-3 mt-3">
-                    <p className="font-medium">📈 How XP Works:</p>
-                    <p>Every logged hour = 10 XP. 100 XP = 1 Level. Higher levels unlock new ranks.</p>
-                    <p>Stats are purely for role‑play and insight—they don't affect scoring.</p>
+                    <p className="font-medium">XP: 1 hour = 10 XP, 100 XP = 1 Level. Stats are for role‑play only.</p>
                   </div>
                 </div>
-                <button onClick={() => setShowRpgInfo(false)} className="w-full mt-4 bg-white/10 py-3 rounded-xl hover:bg-white/20 transition-colors">Got it</button>
+                <button onClick={() => setShowRpgInfo(false)} className="w-full mt-4 bg-white/10 py-3 rounded-xl">Got it</button>
               </div>
             </div>
           </>
@@ -2423,34 +2226,34 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
         {/* Category Selector Modal */}
         {selectedHour !== null && (
           <>
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-40 animate-fade-in" onClick={() => setSelectedHour(null)} />
-            <div className="fixed bottom-0 left-0 right-0 z-50 bg-gray-950/95 backdrop-blur-2xl border-t border-white/20 rounded-t-[2rem] p-6 animate-slide-up">
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 animate-fade-in" onClick={() => setSelectedHour(null)} />
+            <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0A0A0A] border-t border-white/10 rounded-t-[2rem] p-6 animate-slide-up">
               <div className="flex items-center justify-between mb-6">
-                <p className="text-xl font-semibold">Select category for {selectedHour}:00</p>
-                <button onClick={() => setSelectedHour(null)} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-all" style={{ touchAction: "manipulation" }}>✕</button>
+                <p className="text-lg font-light">Select category for {selectedHour}:00</p>
+                <button onClick={() => setSelectedHour(null)} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/15">✕</button>
               </div>
               <div className="grid grid-cols-4 gap-3">
                 {categories.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => handleHourSelect(cat)}
-                    className="bg-white/5 border border-white/20 p-4 rounded-2xl text-sm font-medium hover:bg-white/15 hover:scale-105 transition-all"
+                    className="bg-white/5 border border-white/10 p-4 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all"
                     style={{ touchAction: "manipulation" }}
                   >
                     {cat}
                   </button>
                 ))}
               </div>
-              <div className="mt-6 flex justify-center"><div className="w-12 h-1.5 bg-white/20 rounded-full" /></div>
+              <div className="mt-6 flex justify-center"><div className="w-12 h-1.5 bg-white/10 rounded-full" /></div>
             </div>
           </>
         )}
       </div>
 
       <style jsx>{`
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); border-radius: 10px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
         .animate-fade-in { animation: fade-in 0.2s ease-out; }
         @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -2459,18 +2262,6 @@ const [pulseIntention, setPulseIntention] = useState<"Work" | "Rest" | "Balance"
         .animate-scale-up { animation: scale-up 0.3s ease-out; }
         @keyframes bounce-in { 0% { opacity: 0; transform: translate(-50%, -20px) scale(0.9); } 100% { opacity: 1; transform: translate(-50%, 0) scale(1); } }
         .animate-bounce-in { animation: bounce-in 0.5s ease-out; }
-        @keyframes float-slow { 0%, 100% { transform: translateY(0) translateX(0); } 25% { transform: translateY(-20px) translateX(10px); } 50% { transform: translateY(0) translateX(20px); } 75% { transform: translateY(20px) translateX(10px); } }
-        .animate-float-slow { animation: float-slow 12s ease-in-out infinite; }
-        @keyframes float-slower { 0%, 100% { transform: translateY(0) translateX(0); } 33% { transform: translateY(-15px) translateX(-10px); } 66% { transform: translateY(15px) translateX(-20px); } }
-        .animate-float-slower { animation: float-slower 18s ease-in-out infinite; }
-        @keyframes spin-slow { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
-        .animate-spin-slow { animation: spin-slow 20s linear infinite; }
-        @keyframes spin-slower { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(-360deg); } }
-        .animate-spin-slower { animation: spin-slower 30s linear infinite; }
-        @keyframes fade-in-up { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in-up { animation: fade-in-up 0.8s ease-out forwards; }
-        @keyframes bounce-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-        .animate-bounce-slow { animation: bounce-slow 2s ease-in-out infinite; }
       `}</style>
     </>
   );
